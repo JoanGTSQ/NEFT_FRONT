@@ -1,0 +1,139 @@
+{{define  "yield"}}
+    <main class="container p-3">
+        <div class="container-section">
+        <section id="faqs-section" class="mb-5">
+
+                    <h1 class="h1-responsive font-weight-bold text-center my-4">FAQ'S</h1>
+
+                    <p class="text-center w-responsive mx-auto">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium aperiam temporibus officia porro error dolor?</p>
+
+                    <div class="p-5">
+                        <div class="accordion accordion-flush" id="accordionFlushFaqs">
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq-heading-1">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-1" aria-expanded="false" aria-controls="faq-1">
+                                        Accordion Item #1
+                                    </button>
+                                </h2>
+                                <div id="faq-1" class="accordion-collapse collapse" aria-labelledby="faq-heading-1" data-bs-parent="#accordionFlushFaqs">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq-heading-2">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-2" aria-expanded="false" aria-controls="faq-2">
+                                        Accordion Item #2
+                                    </button>
+                                </h2>
+                                <div id="faq-2" class="accordion-collapse collapse" aria-labelledby="faq-heading-2" data-bs-parent="#accordionFlushFaqs">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="faq-heading-3">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq-3" aria-expanded="false" aria-controls="faq-3">
+                                        Accordion Item #3
+                                    </button>
+                                </h2>
+                                <div id="faq-3" class="accordion-collapse collapse" aria-labelledby="faq-heading-3" data-bs-parent="#accordionFlushFaqs">
+                                    <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+                <section id="stats-section" class="mb-5">
+                    <h2 style="text-align:center">Our statistics </h2>
+                    <h4 style="text-align:center">Tests</h4>
+                    <div class="card-group">
+                        <div class="card text-center">
+                            <div class="card-body" >
+                            <h5 class="card-title">Total Queue</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.QueueSize}}</p>
+                            </div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="card-body">
+                            <h5 class="card-title">Tests processed</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.ProcessedTotal}}</p>
+                            </div>
+                        </div>
+                        </div>
+                        <h4 style="text-align:center">Nodes</h4>
+                    <div class="card-group">
+                        <div class="card text-center">
+                            <div class="card-body" {{if eq .Yield.RenderValues.RenderValues.Worker1 "ON" }}
+                                                    style="background-color:green;color:white"
+                                                    {{else}} {{if eq .Yield.RenderValues.RenderValues.Worker1 "NOT IMPLEMENTED" }}
+                                                    style="background-color:orange"
+                                                    {{else}}
+                                                    style="background-color:red"
+                                                    {{end}}{{end}}>
+                            <h5 class="card-title">NODE 1</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.Worker1}}</p>
+                            </div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="card-body" {{if eq .Yield.RenderValues.RenderValues.Worker2 "ON" }}
+                                                    style="background-color:green;color:white"
+                                                    {{else}} {{if eq .Yield.RenderValues.RenderValues.Worker2 "NOT IMPLEMENTED" }}
+                                                    style="background-color:orange"
+                                                    {{else}}
+                                                    style="background-color:red"
+                                                    {{end}}{{end}}>
+                            <h5 class="card-title">NODE 2</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.Worker2}}</p>
+                            </div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="card-body" {{if eq .Yield.RenderValues.RenderValues.Worker3 "ON" }}
+                                                    style="background-color:green;color:white"
+                                                    {{else}} {{if eq .Yield.RenderValues.RenderValues.Worker3 "NOT IMPLEMENTED" }}
+                                                    style="background-color:orange"
+                                                    {{else}}
+                                                    style="background-color:red"
+                                                    {{end}}{{end}}>
+                            <h5 class="card-title">NODE 3</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.Worker3}}</p>
+                            </div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="card-body" {{if eq .Yield.RenderValues.RenderValues.Worker4 "ON" }}
+                                                    style="background-color:green;color:white"
+                                                    {{else}} {{if eq .Yield.RenderValues.RenderValues.Worker4 "NOT IMPLEMENTED" }}
+                                                    style="background-color:orange"
+                                                    {{else}}
+                                                    style="background-color:red"
+                                                    {{end}}{{end}}>
+                            <h5 class="card-title">NODE 4</h5>
+                            <p class="card-text">{{.Yield.RenderValues.RenderValues.Worker4}}</p>
+                            </div>
+                        </div>
+                        </div>
+                    <div class="status">
+
+                        <h2 style="text-align:center">STATUS</h2>
+                        <ul>
+                            {{range .Yield.Status}}
+                                <li {{if eq .Status "Offline"}}
+                                        class="offline"
+                                {{else}}{{if eq .Status "Online"}}
+                                        class="online"
+                                {{else}}{{if eq .Status "Maitenance"}}
+                                        class="maintenance"
+                                {{end}}{{end}}{{end}}
+                                >{{.Name}}</li>
+                            {{end}}
+                        </ul>
+
+                    </div>
+                </section>
+
+        </div>
+    </main>
+{{end}}
+{{template "yield"}}

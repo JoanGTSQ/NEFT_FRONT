@@ -1,0 +1,16 @@
+port:
+logger-output-path:
+
+urlRedirect: localhost:2024
+oauthStateString: dasdasdas
+
+google:
+    clientID: 370275429328-m68d27ujfvl9rjf277g8mia2ulerha1l.apps.googleusercontent.com
+    clientSecret: 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
+
+userDB:
+    host: localhost
+    port: 5432  
+    user: postgres
+    database: project_dev
+    password: PuroVici!1

@@ -1,0 +1,55 @@
+{{define  "yield"}}
+    <main class="container p-3">
+        <div class="container-section">
+        <section id="contact-section" class="mb-5">
+        <h1 class="h1-responsive font-weight-bold text-center my-4">Change Logs</h1>
+    <div class="row justify-content-center">
+        {{if .Alert}}
+            {{template "alert" .Alert}}
+        {{end}}
+
+        <div class="container-versions">
+            {{range .Yield}}
+                {{if .VersionChangelog.Published}}
+                    <div class="card" style="width: 18rem;text-align: center">
+                        <div class="card-body">
+                            <h5 class="card-title">{{.VersionChangelog.Title}}</h5>
+                            <a href="#{{.VersionChangelog.ID}}" class="btn btn-primary">Go To this version</a>
+                        </div>
+                    </div>
+                {{end}}
+            {{end}}
+        </div>
+        <div class="col-lg-8 col-md-10 col-12">
+        {{range .Yield}}
+            {{if .VersionChangelog.Published}}
+                <h5 class="mt-4" id="{{.VersionChangelog.ID}}"> <span class="p-2 bg-light shadow rounded" style="background-color:#62929A !important;color:white">{{.VersionChangelog.Title}}</span>{{.Date}}</h5>
+                <ul class="list-unstyled mt-3">
+                    {{if .ChangesWeb}}
+                        <li class="text-muted ml-3" style="font-size:1.4em"><i class="mdi mdi-circle-medium mr-2"></i><b>Web</b></li>
+                        {{range .ChangesWeb}}
+                            <li class="text-muted ml-3"><i class="mdi mdi-circle-medium mr-2"></i>-  {{.Title}}</li>
+                        {{end}}
+                    {{end}}
+                    {{if .ChangesCerberus}}
+                        <li class="text-muted ml-3" style="font-size:1.4em"><i class="mdi mdi-circle-medium mr-2"></i><b>Cerberus</b></li>
+                        {{range .ChangesCerberus}}
+                            <li class="text-muted ml-3"><i class="mdi mdi-circle-medium mr-2"></i>-  {{.Title}}</li>
+                        {{end}}
+                    {{end}}
+                    {{if .ChangesInternal}}
+                        <li class="text-muted ml-3" style="font-size:1.4em"><i class="mdi mdi-circle-medium mr-2"></i><b>Internal</b></li>
+                        {{range .ChangesInternal}}
+                            <li class="text-muted ml-3"><i class="mdi mdi-circle-medium mr-2"></i>-  {{.Title}}</li>
+                        {{end}}
+                    {{end}}
+                </ul>
+            {{end}}
+        {{end}}
+        </div>
+    </div>
+        </section>
+        </div>
+    </main>
+{{end}}
+{{template "yield"}}
