@@ -18,6 +18,8 @@ import (
 	"jgt.solutions/controllers"
 	"jgt.solutions/middleware"
 	"jgt.solutions/models"
+	"github.com/briandowns/spinner"
+	"time"
 )
 
 var (
@@ -29,6 +31,7 @@ var (
   dbUser        string
   dbPassword    string
   dbName        string
+	Spinner				*spinner.Spinner
 )
 
 func init() {
@@ -43,6 +46,11 @@ func init() {
 }
 
 func main() {
+	Spinner = spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr))
+	Spinner.Color("bgBlack", "bold", "fgGreen")
+	Spinner.Suffix = "Starting server..."
+	Spinner.Start()
+	
 	flag.Parse()
 	if enableStats {
 		f, err := os.OpenFile("log.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -53,14 +61,9 @@ func main() {
 		wrt := io.MultiWriter(os.Stdout, f)
 		log.SetOutput(wrt)
 	}
+	Spinner.Suffix = " Connecting to database."
+	Spinner.Restart()
 
-	log.Println("Starting....")
-	log.Println("Redis server configured.")
-
-	controllers.InitializeViper()
-	controllers.InitializeOAuthGoogle()
-	log.Println("Connecting to database.")
-  
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
 	dbDirection, 5432, dbUser, dbPassword, dbName)
 	services, err := models.NewServices(psqlInfo)
@@ -76,16 +79,14 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	log.Println("Configuring all static pages...")
+	Spinner.Suffix = " Configuring all static pages..."
+	Spinner.Restart()
 	staticC := controllers.NewStatic()
-  log.Println("Configuring all contact pages...")
+	Spinner.Suffix = " Configuring all contact pages..."
+	Spinner.Restart()
 	contactC := controllers.NewContact()
-  log.Println("Configuring all users pages...")
-	userC := controllers.NewUsers(services.User)
- //  log.Println("Configuring all cerberus pages...")
-	// CerberusC := cerberusController.NewCerberus(services.Test)
- //  log.Println("Configuring all gia pages...")
-	// giaC := giaController.NewGia(services.Test)
+
+
 
 	r := mux.NewRouter()
 	cssHandler := http.FileServer(http.Dir("./css/"))
@@ -121,72 +122,26 @@ func main() {
 	if err != nil {
 		return
 	}
-	log.Println("Configuring middleware")
+	Spinner.Suffix = " Configuring middleware..."
+	Spinner.Restart()
 	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
 	userMW := middleware.User{
 		UserService: services.User,
 	}
-	requireUseMW := middleware.RequireUser{
-		User: userMW,
-	}
 
-	log.Println("Applying routes")
+	Spinner.Suffix = " Applying routes..."
+	Spinner.Restart()
+	
 	r.HandleFunc("/", staticC.NewHome).Methods("GET")
-	r.HandleFunc("/", contactC.ContactForm).Methods("POST")
-
-	// // /cerberus
-	// r.HandleFunc("/cerberus", requireUseMW.Apply(CerberusC.New)).Methods("GET")
-
-	// // /cerberus/users
-	// r.HandleFunc("/cerberus/users", requireUseMW.CheckPerm(CerberusC.GetUsers)).Methods("GET")
-	// r.HandleFunc("/cerberus/users", requireUseMW.CheckPerm(CerberusC.PostUsers)).Methods("POST")
- //  r.HandleFunc("/cerberus/users/{id:[0-9]+}", requireUseMW.Apply(CerberusC.GetUser)).Methods("GET")
-	// // /cerberus/versions
-	// r.HandleFunc("/cerberus/versions", requireUseMW.Apply(CerberusC.GetVersions)).Methods("GET")
-	// r.HandleFunc("/cerberus/versions", requireUseMW.Apply(CerberusC.PostVersions)).Methods("POST")
-	// r.HandleFunc("/cerberus/versions/{id:[0-9]+}", requireUseMW.Apply(CerberusC.SeeVersions)).Methods("GET")
-
-	// // /cerberus/ticketss
-	// r.Handle("/cerberus/tickets", requireUseMW.Apply(CerberusC.GetTickets)).Methods("GET")
-	// r.Handle("/cerberus/tickets", requireUseMW.Apply(CerberusC.PostTicket)).Methods("POST")
-	// r.Handle("/cerberus/tickets/{ticketId:[0-9]+}", requireUseMW.Apply(CerberusC.SeeTicket)).Methods("GET")
-	// r.Handle("/cerberus/tickets/{ticketId:[0-9]+}", requireUseMW.Apply(CerberusC.PostTickets)).Methods("POST")
-	// // /cerberus/test
-	// r.HandleFunc("/cerberus/test", requireUseMW.Apply(CerberusC.GetTest)).Methods("GET")
-	// r.HandleFunc("/cerberus/test/{testId:[0-9]+}", requireUseMW.Apply(CerberusC.SeeTest)).Methods("GET")
-
-	// //GIA
-	// r.HandleFunc("/cerberus/gia", requireUseMW.Apply(giaC.New)).Methods("GET")
-	// r.HandleFunc("/cerberus/gia", requireUseMW.Apply(giaC.POST)).Methods("POST")
-	// // /cerberus/changelog
-	// r.HandleFunc("/cerberus/changelog", requireUseMW.CheckPerm(CerberusC.GetAdminChangelog)).Methods("GET")
-	// r.HandleFunc("/cerberus/changelog", requireUseMW.CheckPerm(CerberusC.PostAdminChangelog)).Methods("POST")
-	// r.HandleFunc("/cerberus/changelog/{changelog:[0-9]+}", requireUseMW.CheckPerm(CerberusC.GetIDChangeLog)).Methods("GET")
-	// r.HandleFunc("/cerberus/changelog/{changelog:[0-9]+}", requireUseMW.CheckPerm(CerberusC.PostIDChangeLog)).Methods("POST")
-	// // STATIC WEBPAGE
-	// r.HandleFunc("/changelog", CerberusC.GetChangelog).Methods("GET")
-	// r.HandleFunc("/faq", CerberusC.NewFaq).Methods("GET")
+	r.HandleFunc("/",contactC.ContactForm).Methods("POST")
 
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
-	// Login And Register
-	r.HandleFunc("/newgoogle", controllers.HandleGoogleRegister)
-	r.HandleFunc("/registergoogle", userC.CallBackFromGoogle)
-	r.HandleFunc("/logingoogle", controllers.HandleGoogleLogin)
-	r.HandleFunc("/logingl", userC.CallBackLoginFromGoogle)
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.New)).Methods("GET")
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.Create)).Methods("POST")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.LoginNew)).Methods("GET")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.Login)).Methods("POST")
-	r.HandleFunc("/logout", userC.Logout).Methods("POST")
-	r.Handle("/forgot", userC.ForgotPwView).Methods("GET")
-	r.HandleFunc("/forgot", userC.InitiateReset).Methods("POST")
-	r.HandleFunc("/reset", userC.ResetPw).Methods("GET")
-	r.HandleFunc("/reset", userC.CompleteReset).Methods("POST")
+
 
 
 	// Start server
-	log.Println("Starting web servers....")
+	
 	if enableStats {
 		go middleware.PrintStats()
 		r.Use(middleware.IPREMOTE)
@@ -195,9 +150,14 @@ func main() {
   if port == "" {
       port = "9000" // Default port if not specified
   }
-  http.ListenAndServe(":" + port,csrfMw(userMW.Apply(r)))
+	Spinner.Suffix = " Running web server on " + port
+	Spinner.Restart()
+  http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
+	
 	// go runServer80()
 	// runServerSSL(csrfMw(userMW.Apply(r)))
+	// s.Suffix = " Running web server..."
+	// s.Restart()
 }
 func runServerSSL(handler http.Handler) {
 	log.Println("Starting web server at ::" + portWebServer)

@@ -476,3 +476,23 @@ section {
 #footer .credits a {
   color: #ff3333;
 }
+
+/*--------------------------------------------------------------
+# Icons RRSS
+--------------------------------------------------------------*/
+.bi-instagram:hover{
+	background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+}
+.bi-twitter:hover{
+	color:#1DA1F2;
+}
+.bi:hover {
+	transition: all 1s;
+}
+.bi-tiktok:hover {
+  color: #111111; 
+  filter: drop-shadow(2px 0px 0px #FD3E3E) drop-shadow(-2px -2px 0px #4DE8F4);
+}
