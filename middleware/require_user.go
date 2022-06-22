@@ -2,17 +2,15 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
 	"jgt.solutions/context"
 	"jgt.solutions/models"
+	"jgt.solutions/errorController"
 )
 
 var mySigningKey = []byte("captainjacksparrowsayshi")
@@ -93,41 +91,9 @@ func (mw *RequireUser) CheckPerm(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func IPREMOTE(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-
-		if !strings.Contains(req.RequestURI, "css") &&
-			!strings.Contains(req.RequestURI, "js") &&
-			!strings.Contains(req.RequestURI, "fonts") &&
-			!strings.Contains(req.RequestURI, "assets") {
-			log.Println("NEW ACCESS: " + req.RemoteAddr + ":" + req.RequestURI)
-		}
-		next.ServeHTTP(res, req)
-	})
-}
-type Stat struct{
-	s 	*spinner.Spinner
-}
-
-
 func PrintStats() {
 	ticker := time.NewTicker(30 * time.Second)
-	statCPU := Stat{
-		s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-	}
-	statCPU.s.Start()
-	statCPUTotal := Stat{
-		s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-	}
-	statCPUTotal.s.Start()
-	statRAM := Stat{
-		s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-	}
-	statRAM.s.Start()
-	statRAMFree := Stat{
-		s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-	}
-	statRAMFree.s.Start()
+
 	quit := make(chan struct{})
 	for {
 		select {
@@ -149,35 +115,25 @@ func PrintStats() {
 				return
 			}
 			total := float64(after.Total - before.Total)
-			preStat := Stat{
-				s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-			}
-			preStat.s.Start()
-			textPre := ("-----os------stats---")
-			preStat.printStat(textPre)
+
+			textPre := ("Printing stats\n-----os------stats---")
 			
-			currentCPU := fmt.Sprintf("cpu system:  %s %%", fmt.Sprintf("%.2f", float64(after.System-before.System)/total*100))
-			statCPU.s.Color("bgBlack", "bold", "fgGreen")
-			statCPU.printStat(currentCPU)
+			currentCPU := fmt.Sprintf("\ncpu system:  %s %%", fmt.Sprintf("%.2f", float64(after.System-before.System)/total*100))
+
 			
 
 			
-			totalCPU := fmt.Sprintf("cpu idle:    %s %%", fmt.Sprintf("%.2f", float64(after.Idle-before.Idle)/total*100))
-			statCPUTotal.printStat(totalCPU)
+			totalCPU := fmt.Sprintf("\ncpu idle:    %s %%", fmt.Sprintf("%.2f", float64(after.Idle-before.Idle)/total*100))
+
 
 			
-			currentRAM := fmt.Sprintf("memory used: %d  mb", memory.Used/1024/1024)
-			statRAM.printStat(currentRAM)
+			currentRAM := fmt.Sprintf("\nmemory used: %d  mb", memory.Used/1024/1024)
 			
-			freeRAM := fmt.Sprintf("memory free: %d  mb", memory.Free/1024/1024)
-			statRAMFree.printStat(freeRAM)
-			textPost := ("--------------------")
-			postStat := Stat{
-				s: spinner.New(spinner.CharSets[11], 100* time.Millisecond, 	spinner.WithWriter(os.Stderr)),
-			}
-			postStat.s.Start()
-			postStat.printStat(textPost)
+			freeRAM := fmt.Sprintf("\nmemory free: %d  mb", memory.Free/1024/1024)
+			
+			textPost := ("\n--------------------")
 
+		errorController.DebugLogger.Println(textPre + currentCPU + totalCPU + currentRAM + freeRAM + textPost)
 		case <-quit:
 			ticker.Stop()
 			return
@@ -185,9 +141,3 @@ func PrintStats() {
 	}  
 }
 
-
-func (stat *Stat)printStat(text string) {
-	stat.s.Color("bgBlack", "bold", "fgGreen")
-	stat.s.Suffix = text
-	stat.s.Restart()
-}

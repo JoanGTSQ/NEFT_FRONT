@@ -8,8 +8,9 @@
 /*--------------------------------------------------------------
 # General
 --------------------------------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Nunito', sans-serif;
   color: #fff;
   background: url("../img/bg.jpg") top center no-repeat;
   background-size: cover;
@@ -489,9 +490,7 @@ section {
 .bi-twitter:hover{
 	color:#1DA1F2;
 }
-.bi:hover {
-	transition: all 1s;
-}
+
 .bi-tiktok:hover {
   color: #111111; 
   filter: drop-shadow(2px 0px 0px #FD3E3E) drop-shadow(-2px -2px 0px #4DE8F4);

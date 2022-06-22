@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"log"
+	"jgt.solutions/errorController"
 
 	"github.com/jinzhu/gorm"
 )
@@ -78,7 +78,7 @@ type TestService interface {
 func NewTestService(gD *gorm.DB) TestService {
 	ug, err := newTestGorm(gD)
 	if err != nil {
-		log.Fatal(err)
+		errorController.ErrorLogger.Println(err)
 		return nil
 	}
 

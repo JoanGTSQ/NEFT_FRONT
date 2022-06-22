@@ -22,7 +22,7 @@ require (
 	cloud.google.com/go v0.34.0 // indirect
 	github.com/DisgoOrg/log v1.1.0 // indirect
 	github.com/DisgoOrg/restclient v1.2.8 // indirect
-	github.com/briandowns/spinner v1.18.1 // indirect
+	github.com/briandowns/spinner v1.18.1
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect

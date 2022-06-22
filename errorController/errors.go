@@ -3,7 +3,8 @@ package errorController
 import (
 	"github.com/DisgoOrg/disgohook"
 	"github.com/DisgoOrg/disgohook/api"
-  "log"
+	"fmt"
+	"os"
 )
 
 const (
@@ -32,6 +33,7 @@ func (m *Message) SendErrorWHWeb() {
 		Build(),
 	)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
+		os.Exit(0)
 	}
 }
