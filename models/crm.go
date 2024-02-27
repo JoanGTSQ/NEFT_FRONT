@@ -67,3 +67,15 @@ type Material struct {
 	Configurations
 	Weight int `gorm:"not null"`
 }
+
+type Order struct {
+	gorm.Model
+	MaterialID  int      `gorm:"" json:"materialid"`
+	Material    Material `gorm:"foreignkey:materialID" json:"material"`
+	TimeMinutes int      `gorm:"not null"`
+	Cost        float64  `gorm:"not null"`
+	Sale        float64  `gorm:"not null"`
+	Sent        bool     `gorm:"not null"`
+	Category    string   `gorm:"not null"`
+	Quality     string   `gorm:"not null"`
+}

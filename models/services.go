@@ -42,7 +42,7 @@ func (s *Services) DestructiveStatic() error {
 }
 
 func (s *Services) AutoMigrate() error {
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil
