@@ -122,7 +122,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/cerberus", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 type LoginForm struct {
@@ -177,7 +177,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		errorController.WD.SendErrorWHWeb()
 		return
 	}
-	http.Redirect(w, r, "/cerberus", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 type ResetPwForm struct {
@@ -279,7 +279,7 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u.signIn(w, user)
-	http.Redirect(w, r, "/cerberus", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
