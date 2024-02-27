@@ -45,7 +45,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	errorController.InitLog(debug)
+	errorController.InitLog(true)
 
 	Spinner = spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 	Spinner.Color("bgBlack", "bold", "fgGreen")
@@ -56,7 +56,7 @@ func main() {
 	Spinner.Restart()
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
-		dbDirection, 5432, dbUser, dbPassword, dbName)
+		"flora.db.elephantsql.com", 5432, "mljgqygv", "ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B", "mljgqygv")
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 		errorController.ErrorLogger.Println("ABORTING...\ndatabase error: ", err)
@@ -68,7 +68,7 @@ func main() {
 	defer services.Close()
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
-	err = services.DestructiveReset()
+	err = services.AutoMigrate()
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -79,7 +79,6 @@ func main() {
 	Spinner.Suffix = " Configuring all contact pages..."
 	Spinner.Restart()
 
-	contactC := controllers.NewContact()
 	Spinner.Suffix = " Configuring all users pages..."
 	Spinner.Restart()
 
@@ -131,8 +130,7 @@ func main() {
 	Spinner.Suffix = " Applying routes..."
 	Spinner.Restart()
 
-	r.HandleFunc("/", staticC.NewHome).Methods("GET")
-	r.HandleFunc("/", contactC.ContactForm).Methods("POST")
+	r.HandleFunc("/", requireUseMW.CheckPerm(staticC.NewHome)).Methods("GET")
 
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")

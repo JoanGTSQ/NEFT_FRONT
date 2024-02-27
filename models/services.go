@@ -12,14 +12,14 @@ func NewServices(connectionInfo string) (*Services, error) {
 
 	return &Services{
 		User: NewUserService(db),
-		Test: NewTestService(db),
+		Crm:  NewCrmService(db),
 		db:   db,
 	}, nil
 }
 
 type Services struct {
 	User UserService
-	Test TestService
+	Crm  CrmService
 	db   *gorm.DB
 }
 
@@ -28,7 +28,7 @@ func (s *Services) Close() error {
 }
 
 func (s *Services) DestructiveReset() error {
-	if err := s.db.DropTableIfExists(&Incidences{}, &StatusCategory{}, &ChangesVersion{}, &Categories{}, &VersionChange{}, &Messages{}, &Tickets{}, &TestCase{}, &Test{}, &Version{}, &User{}, &pwReset{}).Error; err != nil {
+	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}).Error; err != nil {
 		return err
 	}
 	return s.AutoMigrate()
@@ -42,7 +42,7 @@ func (s *Services) DestructiveStatic() error {
 }
 
 func (s *Services) AutoMigrate() error {
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Version{}, &Test{}, &TestCase{}, &Tickets{}, &Messages{}, &VersionChange{}, &Categories{}, &ChangesVersion{}, &StatusCategory{}, &Incidences{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}).Error; err != nil {
 		return err
 	}
 	return nil

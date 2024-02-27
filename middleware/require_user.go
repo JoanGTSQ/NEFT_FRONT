@@ -9,12 +9,11 @@ import (
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
 	"jgt.solutions/context"
-	"jgt.solutions/models"
 	"jgt.solutions/errorController"
+	"jgt.solutions/models"
 )
 
 var mySigningKey = []byte("captainjacksparrowsayshi")
-
 
 type User struct {
 	models.UserService
@@ -29,15 +28,15 @@ func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("remember_token")
 		if err != nil {
-			next(w,r)
+			next(w, r)
 			return
 		}
 		user, err := mw.UserService.ByRemember(cookie.Value)
 		if err != nil {
-			next(w,r)
+			next(w, r)
 			return
 		}
-    
+
 		ctx := r.Context()
 		ctx = context.WithUser(ctx, user)
 		r = r.WithContext(ctx)
@@ -67,7 +66,7 @@ func (mw *RequireUser) CheckUser(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		} else {
-			http.Redirect(w, r, "/cerberus", http.StatusFound)
+			http.Redirect(w, r, "/", http.StatusFound)
 			return
 		}
 
@@ -86,7 +85,7 @@ func (mw *RequireUser) CheckPerm(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		} else {
-			http.Redirect(w, r, "/cerberus", http.StatusFound)
+			http.Redirect(w, r, "/404", http.StatusFound)
 		}
 	})
 }
@@ -117,27 +116,21 @@ func PrintStats() {
 			total := float64(after.Total - before.Total)
 
 			textPre := ("Printing stats\n-----os------stats---")
-			
+
 			currentCPU := fmt.Sprintf("\ncpu system:  %s %%", fmt.Sprintf("%.2f", float64(after.System-before.System)/total*100))
 
-			
-
-			
 			totalCPU := fmt.Sprintf("\ncpu idle:    %s %%", fmt.Sprintf("%.2f", float64(after.Idle-before.Idle)/total*100))
 
-
-			
 			currentRAM := fmt.Sprintf("\nmemory used: %d  mb", memory.Used/1024/1024)
-			
+
 			freeRAM := fmt.Sprintf("\nmemory free: %d  mb", memory.Free/1024/1024)
-			
+
 			textPost := ("\n--------------------")
 
-		errorController.DebugLogger.Println(textPre + currentCPU + totalCPU + currentRAM + freeRAM + textPost)
+			errorController.DebugLogger.Println(textPre + currentCPU + totalCPU + currentRAM + freeRAM + textPost)
 		case <-quit:
 			ticker.Stop()
 			return
 		}
-	}  
+	}
 }
-

@@ -13,7 +13,7 @@ import (
 
 func NewStatic() *Static {
 	return &Static{
-		Home:     views.NewView("bootstrap", "static/home"),
+		Home:     views.NewView("dashboard", "static/home"),
 		NotFound: views.NewView("error404", "static/404"),
 		Error:    views.NewView("bootstrap", "static/505"),
 	}
@@ -31,7 +31,7 @@ func (c *Static) NewHome(w http.ResponseWriter, r *http.Request) {
 
 func NewContact() *Contact {
 	return &Contact{
-		HomeView:  views.NewView("bootstrap", "static/home"),
+		HomeView:  views.NewView("dashboard", "static/home"),
 		LoginView: views.NewView("dashboard", "users/login"),
 	}
 }
@@ -71,7 +71,6 @@ func (c *Contact) ContactForm(w http.ResponseWriter, r *http.Request) {
 		c.HomeView.Render(w, r, &vd)
 		return
 	}
-
 
 	vd.Alert = &views.Alert{
 		Level:   views.AlertLvlSuccess,
