@@ -2,7 +2,6 @@ package views
 
 import (
 	"bytes"
-	"errors"
 	"html/template"
 	"io"
 	"net/http"
@@ -24,11 +23,7 @@ func NewView(layout string, files ...string) *View {
 	addTemplatePath(files)
 	addTemplateExt(files)
 	files = append(files, layoutFiles()...)
-	t, err := template.New("").Funcs(template.FuncMap{
-		"csrfField": func() (template.HTML, error) {
-			return "", errors.New("csrf is not implemented")
-		},
-	}).ParseFiles(files...)
+	t, err := template.New("").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
     log.Println(err)
 		errorController.WD.Content = err.Error()
@@ -67,12 +62,12 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	vd.User = context.User(r.Context())
 	var buf bytes.Buffer
 	csrfField := csrf.TemplateField(r)
-
-  tpl := v.Template.Funcs(template.FuncMap{
+    tpl := v.Template.Funcs(template.FuncMap{
 		"csrfField": func() template.HTML {
 			return csrfField
 		},
 	})
+    
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
     log.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
@@ -83,6 +78,7 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	}
 	io.Copy(w, &buf)
 }
+
 func (v *View) Flush(w http.ResponseWriter, r *http.Request, data interface{}) {
 	if r.RequestURI == "/" {
 		r.RequestURI = "/#contact"

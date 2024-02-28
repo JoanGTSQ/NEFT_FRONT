@@ -412,13 +412,13 @@
 
       if(jQuery("#chart-apex-column-01").length){
         var options = {
-          series: [{
-          name: 'Incomes',
-          data: [90, 105, 72, 90, 65, 109, 130]
-        }, {
-          name: 'Expenses',
-          data: [115, 93, 75, 102, 144, 52, 71]
-        }],
+            series: [{
+              name: 'Incomes',
+              data: [90, 105, 72, 90, 65, 109, 130]
+            }, {
+              name: 'Expenses',
+              data: [115, 93, 75, 102, 144, 52, 71]
+            }],
         colors: ['#1f1f7a', '#2e2eb8'],
           chart: {
           height: 265,
@@ -468,20 +468,23 @@
           },
         },
         xaxis: {
-          type: 'datetime',
+          type: 'date',
           labels: {
             minHeight: 20,
             maxHeight: 20
           },
-          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+          categories: []
         },
         tooltip: {
           x: {
-            format: 'dd/MM/yy HH:mm'
+            format: 'd/M/yyyy'
           },
         },
         };
-
+          var datosChart1 = window.datosChart1;
+        options.series = datosChart1.series;
+          options.categories = datosChart1.categories;
+          console.log(options.categories);
         var chart = new ApexCharts(document.querySelector("#chart-apex-column-01"), options);
         chart.render();
       }

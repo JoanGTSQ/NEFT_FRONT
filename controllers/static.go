@@ -13,20 +13,14 @@ import (
 
 func NewStatic() *Static {
 	return &Static{
-		Home:     views.NewView("dashboard", "static/home"),
 		NotFound: views.NewView("error404", "static/404"),
 		Error:    views.NewView("bootstrap", "static/505"),
 	}
 }
 
 type Static struct {
-	Home     *views.View
 	NotFound *views.View
 	Error    *views.View
-}
-
-func (c *Static) NewHome(w http.ResponseWriter, r *http.Request) {
-	c.Home.Render(w, r, nil)
 }
 
 func NewContact() *Contact {

@@ -6,9 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -28,7 +26,6 @@ var (
 	dbUser        string
 	dbPassword    string
 	dbName        string
-	Spinner       *spinner.Spinner
 )
 
 func init() {
@@ -47,13 +44,7 @@ func main() {
 	flag.Parse()
 	errorController.InitLog(true)
 
-	Spinner = spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
-	Spinner.Color("bgBlack", "bold", "fgGreen")
-	Spinner.Suffix = "Starting server..."
-	Spinner.Start()
-
-	Spinner.Suffix = " Connecting to database."
-	Spinner.Restart()
+	errorController.InfoLogger.Println("Starting server")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
 		"flora.db.elephantsql.com", 5432, "mljgqygv", "ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B", "mljgqygv")
@@ -66,22 +57,19 @@ func main() {
 		os.Exit(0)
 	}
 	defer services.Close()
+
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
+	errorController.InfoLogger.Println("Configuring Database connection")
 	err = services.AutoMigrate()
 	if err != nil {
 		fmt.Println(err)
 	}
-	Spinner.Suffix = " Configuring all static pages..."
-	Spinner.Restart()
+
+	errorController.InfoLogger.Println("Configuring all controllers")
 
 	staticC := controllers.NewStatic()
-	Spinner.Suffix = " Configuring all contact pages..."
-	Spinner.Restart()
-
-	Spinner.Suffix = " Configuring all users pages..."
-	Spinner.Restart()
-
+	crmC := controllers.NewCrm(services.Crm)
 	userC := controllers.NewUsers(services.User)
 
 	r := mux.NewRouter()
@@ -117,8 +105,10 @@ func main() {
 	if err != nil {
 		return
 	}
-	Spinner.Suffix = " Configuring middleware..."
-	Spinner.Restart()
+
+	// Middleware configuration
+	errorController.InfoLogger.Println("Configuring middleware...")
+
 	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
 	userMW := middleware.User{
 		UserService: services.User,
@@ -127,10 +117,10 @@ func main() {
 		User: userMW,
 	}
 
-	Spinner.Suffix = " Applying routes..."
-	Spinner.Restart()
+	// Routes configuration
+	errorController.InfoLogger.Println("Applying routes...")
 
-	r.HandleFunc("/", requireUseMW.CheckPerm(staticC.NewHome)).Methods("GET")
+	r.HandleFunc("/", requireUseMW.CheckPerm(crmC.Home)).Methods("GET")
 
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
@@ -156,8 +146,8 @@ func main() {
 	if port == "" {
 		port = "9000" // Default port if not specified
 	}
-	Spinner.Suffix = " Running web server on port " + port
-	Spinner.Restart()
+	errorController.InfoLogger.Println("Running web server on port " + port)
+
 	http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
 
 	// go runServer80()

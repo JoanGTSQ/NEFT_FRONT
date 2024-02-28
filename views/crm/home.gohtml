@@ -827,7 +827,7 @@
                               <li class="nav-item nav-icon dropdown">
                                   <a href="#" class="nav-item nav-icon dropdown-toggle pr-0 search-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
                                       <img src="/assets/images/user/1.jpg" class="img-fluid avatar-rounded" alt="user">
-                                      <span class="mb-0 ml-2 user-name">{{.User.Name}}</span>
+                                      <span class="mb-0 ml-2 user-name">{{.User.Name}} </span>
                                   </a>
                                   <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                       <li class="dropdown-item d-flex svg-icon">
@@ -874,7 +874,7 @@
    <div class="row">
       <div class="col-md-12 mb-4 mt-1">
          <div class="d-flex flex-wrap justify-content-between align-items-center">
-             <h4 class="font-weight-bold">Overview</h4>
+             <h4 class="font-weight-bold">Resumen</h4>
              <div class="form-group mb-0 vanila-daterangepicker d-flex flex-row">
                   <div class="date-icon-set">
                      <input type="text" name="start" class="form-control" placeholder="From Date">
@@ -907,8 +907,8 @@
                         <div class="">
                             <p class="mb-2 text-secondary">Total Profit</p>
                             <div class="d-flex flex-wrap justify-content-start align-items-center">
-                               <h5 class="mb-0 font-weight-bold">$95,595</h5>
-                               <p class="mb-0 ml-3 text-success font-weight-bold">+3.55%</p>
+                               <h5 class="mb-0 font-weight-bold">{{minus .Yield.TotalSales .Yield.TotalOrderExpenses}}</h5>
+                               <p class="mb-0 ml-3 text-success font-weight-bold">+{{percentage .Yield.TotalSales .Yield.TotalOrderExpenses}}%</p>
                             </div>                            
                         </div>
                      </div>
@@ -920,10 +920,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                            <p class="mb-2 text-secondary">Total Expenses</p>
+                            <p class="mb-2 text-secondary">Total Orders Expenses</p>
                             <div class="d-flex flex-wrap justify-content-start align-items-center">
-                               <h5 class="mb-0 font-weight-bold">$12,789</h5>
-                               <p class="mb-0 ml-3 text-success font-weight-bold">+2.67%</p>
+                               <h5 class="mb-0 font-weight-bold">{{.Yield.TotalOrderExpenses}}</h5></h5>
+                               <p class="mb-0 ml-3 text-success font-weight-bold">+2.67% (TODO)</p>
                             </div>                            
                         </div>
                     </div>
@@ -935,10 +935,10 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="">
-                           <p class="mb-2 text-secondary">New Users</p>
+                           <p class="mb-2 text-secondary">Total Sales</p>
                            <div class="d-flex flex-wrap justify-content-start align-items-center">
-                              <h5 class="mb-0 font-weight-bold">13,984</h5>
-                              <p class="mb-0 ml-3 text-danger font-weight-bold">-9.98%</p>
+                              <h5 class="mb-0 font-weight-bold">{{.Yield.TotalSales}}</h5>
+                              <p class="mb-0 ml-3 text-danger font-weight-bold">-9.98% (TODO)</p>
                            </div>                            
                         </div>
                     </div>
@@ -1225,7 +1225,7 @@
          <div class="card">
             <div class="card-header d-flex justify-content-between">
                <div class="header-title">
-                  <h4 class="card-title">New Customer</h4>
+                  <h4 class="card-title">Last sales</h4>
                </div>
                <div class="card-header-toolbar d-flex align-items-center">                  
                   <div class="dropdown">
@@ -1267,92 +1267,31 @@
                      <thead class="table-color-heading">
                         <tr class="text-secondary">
                            <th scope="col">Date</th>
+                           <th scope="col">Material</th>
                            <th scope="col">Customer</th>
-                           <th scope="col">Status</th>
-                           <th scope="col" class="text-right">Total</th>
+                           <th scope="col">Cost</th>
+                           <th scope="col">Sale</th>
+                           <th scope="col" class="text-right">Profit</th>
                         </tr>
                      </thead>
                      <tbody>
+                     {{range .Yield.Orders}}
                         <tr class="white-space-no-wrap">
-                           <td>01 Jun 2020</td>
+                            <td>{{ formatDate .CreatedAt}}</td>
+                           <td>{{.Material.Name}} | {{.Material.Color}}</td>
                            <td>
-                              <div class="d-flex align-items-center">
-                                 <div class="avatar-45 mr-2">
-                                    <img src="/assets/images/user/2.jpg" class="img-fluid rounded-circle"
-                                       alt="image">
-                                 </div>
-                                 <div>Maggie Potts</div>
-                              </div>
+                              
+                              {{.Costumer.Name}}
                            </td>
                            <td>
-                              <p class="mb-0 text-success d-flex justify-content-start align-items-center">
-                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="none">                                                
-                                 <circle cx="12" cy="12" r="8" fill="#3cb72c"></circle></svg>
-                                 </small> Completed
+                              <p class="mb-0 text-success d-flex justify-content-start align-items-center">${{.Cost}}
                               </p>
                            </td>
-                           <td class="text-right">$104.98</td>
+                           <td>${{.Sale}}</td>
+                           <td class="text-right">${{minus .Sale .Cost }}</td>
                         </tr>
-                        <tr class="white-space-no-wrap">
-                           <td>02 Jun 2020</td>
-                           <td>
-                              <div class="d-flex align-items-center">
-                                 <div class="avatar-45 mr-2">
-                                    <img src="/assets/images/user/5.jpg" class="img-fluid rounded-circle"
-                                       alt="image">
-                                 </div>
-                                 <div>Kevin Adkins</div>
-                              </div>
-                           </td>
-                           <td>
-                              <p class="mb-0 text-success d-flex justify-content-start align-items-center">
-                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="none">                                                
-                                 <circle cx="12" cy="12" r="8" fill="#3cb72c"></circle></svg>
-                                 </small> Completed
-                              </p>
-                           </td>
-                           <td class="text-right">$233.00</td>
-                        </tr>
-                        <tr class="white-space-no-wrap">
-                           <td>05 Jun 2020</td>
-                           <td>
-                              <div class="d-flex align-items-center">
-                                 <div class="avatar-45 mr-2">
-                                    <img src="/assets/images/user/1.jpg" class="img-fluid rounded-circle"
-                                       alt="image">
-                                 </div>
-                                 <div>Max Lynn</div>
-                              </div>
-                           </td>
-                           <td>
-                              <p class="mb-0 text-warning d-flex justify-content-start align-items-center">
-                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="none">                                                
-                                 <circle cx="12" cy="12" r="8" fill="#db7e06"></circle></svg>
-                                 </small>Pending
-                              </p>
-                           </td>
-                           <td class="text-right">$150.01</td>
-                        </tr>
-                        <tr class="white-space-no-wrap">
-                           <td>06 Jun 2020</td>
-                           <td>
-                              <div class="d-flex align-items-center">
-                                 <div class="avatar-45 mr-2">
-                                    <img src="/assets/images/user/3.jpg" class="img-fluid rounded-circle"
-                                       alt="image">
-                                 </div>
-                                 <div>Danniw Yatt</div>
-                              </div>
-                           </td>
-                           <td>
-                              <p class="mb-0 text-danger d-flex justify-content-start align-items-center">
-                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="none">                                                
-                                 <circle cx="12" cy="12" r="8" fill="#F42B3D"></circle></svg>
-                                 </small>Cancelled
-                              </p>
-                           </td>
-                           <td class="text-right">$199.99</td>
-                        </tr>                        
+                        {{end}}
+                      
                      </tbody>
                   </table>
                   <div class="d-flex justify-content-end align-items-center border-top-table p-3">
@@ -1414,10 +1353,6 @@
     <!-- Vectoe Map JavaScript -->
     <script src="/assets/js/vector-map-custom.js"></script>
     
-    <!-- Chart Custom JavaScript -->
-    <script src="/assets/js/chart-custom.js"></script>
-    <script src="/assets/js/charts/01.js"></script>
-    <script src="/assets/js/charts/02.js"></script>
     
     <!-- slider JavaScript -->
     <script src="/assets/js/slider.js"></script>
@@ -1428,5 +1363,30 @@
     
     <!-- app JavaScript -->
     <script src="/assets/js/app.js"></script>
+    <!-- Script para inicializar el gráfico y almacenar la instancia en una variable -->
+    <script>
+      var datosChart1 = {
+    series: [{
+      name: 'Ingresos',
+      data: [ {{range .Yield.Orders}}
+                {{.Sale}},
+                {{end}}]
+    }, {
+      name: 'Gastos',
+      data: [{{range .Yield.Orders}}
+                {{.Cost}},
+                {{end}}]
+    }],
+    categories: [ {{range .Yield.Orders}} 
+    '{{ formatDate .CreatedAt}}',
+    {{end}}
+    ]
+  };
+    </script>
+    <!-- Chart Custom JavaScript -->
+    <script src="/assets/js/chart-custom.js"></script>
+    <script src="/assets/js/charts/01.js"></script>
+    <script src="/assets/js/charts/02.js"></script>
+
 {{end}}
 {{template "yield"}}
