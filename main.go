@@ -121,8 +121,9 @@ func main() {
 	errorController.InfoLogger.Println("Applying routes...")
 
 	r.HandleFunc("/", requireUseMW.CheckPerm(crmC.Home)).Methods("GET")
-
-	r.NotFoundHandler = staticC.NotFound
+    r.HandleFunc("/products", requireUseMW.CheckPerm(crmC.Products)).Methods("GET")
+    r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.FormNewProduct)).Methods("GET")
+    r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
 	// Login And Register

@@ -15,7 +15,7 @@ type CrmDB interface {
 
 	GetAllProducts() ([]*Product, error)
 
-    GetAllCategories() ([]*Category, error)
+	GetAllCategories() ([]*Category, error)
 }
 
 type CrmService interface {
@@ -132,6 +132,7 @@ type Product struct {
 	Price       float64    `gorm:"not null"`
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
+	Weight      int        `gorm:""`
 }
 type Configurations struct {
 	gorm.Model
