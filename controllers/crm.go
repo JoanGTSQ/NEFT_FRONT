@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"math"
 	"net/http"
 
 	"jgt.solutions/errorController"
@@ -24,9 +23,8 @@ type Crm struct {
 type EssentialData struct {
 	TotalSales         float64
 	TotalOrderExpenses float64
-	Profit             float64
-	ProfitPercentage   float64
 	Orders             []*models.Order
+	Products           []*models.Product
 }
 
 func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
@@ -41,10 +39,12 @@ func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorController.ErrorLogger.Println("nope ", err)
 	}
-	es.Profit = es.TotalSales - es.TotalOrderExpenses
-	es.ProfitPercentage = math.Round((es.TotalSales/es.TotalOrderExpenses)*100) / 10
 
-    es.Orders, err = c.crm.GetAllOrders()
+	es.Orders, err = c.crm.GetAllOrders()
+	if err != nil {
+		errorController.ErrorLogger.Println("nope ", err)
+	}
+	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
 		errorController.ErrorLogger.Println("nope ", err)
 	}

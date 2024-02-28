@@ -34,15 +34,8 @@ func (s *Services) DestructiveReset() error {
 	return s.AutoMigrate()
 }
 
-func (s *Services) DestructiveStatic() error {
-	if err := s.db.DropTableIfExists(&Incidences{}, &StatusCategory{}).Error; err != nil {
-		return err
-	}
-	return s.AutoMigrate()
-}
-
 func (s *Services) AutoMigrate() error {
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Costumer{}, &Order{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Costumer{}, &Category{}, &Product{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil
