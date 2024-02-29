@@ -19,6 +19,9 @@ type CrmDB interface {
 	CreateProduct(product *Product) error
 
 	GetAllCategories() ([]*Category, error)
+
+	CreateCustomer(material *Customer) error
+	GetAllCustomers() ([]*Customer, error)
 }
 
 type CrmService interface {
@@ -133,6 +136,19 @@ func (tg *crmGorm) GetAllMaterials() ([]*Material, error) {
 	return materials, nil
 }
 
+// Functions customer
+func (tg *crmGorm) CreateCustomer(material *Customer) error {
+	return tg.db.Create(material).Error
+}
+func (tg *crmGorm) GetAllCustomers() ([]*Customer, error) {
+	var customers []*Customer
+	err := tg.db.Find(&customers).Error
+	if err != nil {
+		return nil, err
+	}
+	return customers, nil
+}
+
 type Category struct {
 	ProtoModel
 	Name        string `gorm:"not null"`
@@ -163,7 +179,7 @@ type Material struct {
 	Color          string `gorm:"not null"`
 	Supplier       string `gorm:"not null"`
 	Configurations `gorm:"-"`
-	Weight         int `gorm:"not null"`
+	Weight         int     `gorm:"not null"`
 	Price          float64 `gorm:"not null"`
 }
 
