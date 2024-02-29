@@ -28,60 +28,25 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="font-weight-bold mb-3">Basic Information</h5>
-                    <form class="row g-3">
+                    <form class="row g-3" enctype="multipart/form-data" action="/new-product" method="POST">
+                    {{csrfField}}
                         <div class="col-md-6 mb-3">
                             <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Product Name</label>
-                            <input type="text" class="form-control" id="Text1" placeholder="Enter Product Name">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="inputState" class="form-label font-weight-bold text-muted text-uppercase">Category</label>
-                            <select id="inputState" class="form-select form-control choicesjs">
-                                <option value="selected">Select Category</option>
-                                <option value="Electronics">Electronics</option>
-                                <option value="Applications">Applications</option>
-                                <option value="Gadgets">Gadgets</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text2" class="form-label font-weight-bold text-muted text-uppercase">Product Code</label>
-                            <input type="text" class="form-control" id="Text2" placeholder="Enter Product Code">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text3" class="form-label font-weight-bold text-muted text-uppercase">Product Sku</label>
-                            <input type="text" class="form-control" id="Text3" placeholder="Enter Product SKU">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text4" class="form-label font-weight-bold text-muted text-uppercase">manufacturer</label>
-                            <input type="text" class="form-control" id="Text4" placeholder="Enter Manufacturer">
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Enter Product Name">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="Text5" class="form-label font-weight-bold text-muted text-uppercase">Quantity</label>
-                            <input type="text" class="form-control" id="Text5" placeholder="Enter Quantity">
+                            <input type="text" class="form-control" name="weight" id="weight" placeholder="Enter Weight">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="Text6" class="form-label font-weight-bold text-muted text-uppercase">Price</label>
-                            <input type="text" class="form-control" id="Text6" placeholder="Enter Price">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text7" class="form-label font-weight-bold text-muted text-uppercase">Tax</label>
-                            <input type="text" class="form-control" id="Text7" placeholder="Enter Tax">
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label for="Text8" class="form-label font-weight-bold text-muted text-uppercase">Tag</label>
-                            <select id="Text8" class="multipleSelect2 form-control choicesjs" multiple="true">
-                                <option selected value="1">Excellent</option>
-                                <option value="2">Very Good</option>
-                                <option value="3">Good</option>
-                                <option value="4">Not Bad</option>
-                                <option value="5">Bad</option>
-                                <option value="6">Very Bad</option>
-                            </select>
+                            <input type="text" class="form-control" name="price" id="price" placeholder="Enter Price">
                         </div>
                         <div class="col-md-12 mb-3">
                             <label for="Text9" class="form-label font-weight-bold text-muted text-uppercase">Description</label>
-                            <textarea class="form-control" id="Text9" rows="2" placeholder="Enter Description"></textarea>
+                            <textarea class="form-control" name="description" id="description" rows="2" placeholder="Enter Description"></textarea>
                         </div>
-                    </form>
+                    
                 </div>
             </div>
             <div class="card">
@@ -103,14 +68,16 @@
                         </div>
                         <div class="d-flex justify-content-center mt-2 mb-5">
                             <p class="mb-0 text-muted font-weight-bold">Drop files here or click to upload</p>
+                            <input type="file" name="myFile" id="myFile"/>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end mt-3">
-                        <button class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary">
                             Create Product
                         </button>
                     </div>
                 </div>
+                </form>
             </div>
         </div>
     </div>

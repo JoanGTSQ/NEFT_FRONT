@@ -123,6 +123,7 @@ func main() {
 	r.HandleFunc("/", requireUseMW.CheckPerm(crmC.Home)).Methods("GET")
     r.HandleFunc("/products", requireUseMW.CheckPerm(crmC.Products)).Methods("GET")
     r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.FormNewProduct)).Methods("GET")
+    r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.CreateProduct)).Methods("POST")
     r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
