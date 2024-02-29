@@ -14,8 +14,10 @@ func NewCrm(crm models.CrmService) *Crm {
 		NewProduct:    views.NewView("dashboard", "crm/addProduct"),
 		MaterialsView: views.NewView("dashboard", "crm/materials"),
 		NewMaterial:   views.NewView("dashboard", "crm/addMaterial"),
-        CustomersView: views.NewView("dashboard", "crm/customers"),
-        NewCustomer: views.NewView("dashboard","crm/addCustomer"),
+		CustomersView: views.NewView("dashboard", "crm/customers"),
+		NewCustomer:   views.NewView("dashboard", "crm/addCustomer"),
+		OrdersView:    views.NewView("dashboard", "crm/orders"),
+		NewOrder:      views.NewView("dashboard", "crm/addOrder"),
 		crm:           crm,
 	}
 }
@@ -26,8 +28,10 @@ type Crm struct {
 	NewProduct    *views.View
 	MaterialsView *views.View
 	NewMaterial   *views.View
-    CustomersView *views.View
-    NewCustomer   *views.View
+	CustomersView *views.View
+	NewCustomer   *views.View
+	OrdersView    *views.View
+	NewOrder      *views.View
 	crm           models.CrmService
 }
 type EssentialData struct {
