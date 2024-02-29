@@ -130,6 +130,9 @@ func main() {
 	r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.Customers)).Methods("GET")
 	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.FormNewCustomer)).Methods("GET")
 	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.CreateCustomer)).Methods("POST")
+    r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
+    r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
+    // r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.CreateCustomer)).Methods("POST")
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
