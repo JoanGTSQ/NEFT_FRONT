@@ -424,7 +424,7 @@ func (ug *userGorm) Create(user *User) error {
 }
 
 func (ug *userGorm) Delete(id uint) error {
-	user := User{Model: gorm.Model{ID: id}}
+	user := User{ProtoModel: ProtoModel{ID: id}}
 	return ug.db.Delete(&user).Error
 }
 
@@ -433,7 +433,7 @@ func (ug *userGorm) Update(user *User) error {
 }
 
 type User struct {
-	gorm.Model
+    ProtoModel
 	Name         string    `gorm:"not null"`
 	Email        string    `gorm:"not null;unique_index"`
 	Password     string    `gorm:"-"`

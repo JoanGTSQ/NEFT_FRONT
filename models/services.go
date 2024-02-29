@@ -1,6 +1,7 @@
 package models
 
 import "github.com/jinzhu/gorm"
+import "time"
 
 func NewServices(connectionInfo string) (*Services, error) {
 	db, err := gorm.Open("postgres", connectionInfo)
@@ -35,8 +36,15 @@ func (s *Services) DestructiveReset() error {
 }
 
 func (s *Services) AutoMigrate() error {
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Costumer{}, &Category{}, &Product{}, &Order{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Customer{}, &Category{}, &Product{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil
+}
+
+type ProtoModel struct {
+    ID        uint       `gorm:"primary_key" json:"id"`
+    CreatedAt time.Time  `json:"-"`
+    UpdatedAt time.Time  `json:"-"`
+    DeletedAt *time.Time `json:"-" sql:"index"`
 }

@@ -7,14 +7,14 @@
             <div class="col-lg-12">
                 <div class="d-flex flex-wrap align-items-center justify-content-between my-schedule mb-4">
                    <div class="d-flex align-items-center justify-content-between">
-                        <h4 class="font-weight-bold">Productos</h4>
+                        <h4 class="font-weight-bold">Filamentos</h4>
                     </div>  
                     <div class="create-workform">
                         <div class="d-flex flex-wrap align-items-center justify-content-between">
                             <div class="modal-product-search d-flex">
                                 <form class="mr-3 position-relative">
                                     <div class="form-group mb-0">
-                                    <input type="text" class="form-control" id="exampleInputText" placeholder="Buscar producto">
+                                    <input type="text" class="form-control" id="exampleInputText" placeholder="Buscar filamento">
                                     <a class="search-link" href="#">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -22,11 +22,11 @@
                                     </a>
                                     </div>
                                 </form>
-                                <a href="/new-product" class="btn btn-primary position-relative d-flex align-items-center justify-content-between">
+                                <a href="/new-material" class="btn btn-primary position-relative d-flex align-items-center justify-content-between">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
-                                    Añadir producto
+                                    Añadir Material
                                 </a>
                             </div>
                         </div>
@@ -38,7 +38,7 @@
                         <div class="card card-block card-stretch">
                             <div class="card-body p-0">
                                 <div class="d-flex justify-content-between align-items-center p-3">
-                                    <h5 class="font-weight-bold">Lista de productos</h5>
+                                    <h5 class="font-weight-bold">Lista de filamentos</h5>
                                     <button class="btn btn-secondary btn-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="mr-1" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -66,13 +66,13 @@
                                                     <label class="text-muted mb-0" >Precio</label>
                                                 </th>
                                                 <th scope="col">
-                                                    <label class="text-muted mb-0" >Descripcion</label>
+                                                    <label class="text-muted mb-0" >Color</label>
                                                 </th>
                                                 <th scope="col">
                                                     <label class="text-muted mb-0" >Peso</label>
                                                 </th>
                                                 <th scope="col" class="text-right">
-                                                    <label class="text-muted mb-0">Categoria</label>
+                                                    <label class="text-muted mb-0">Proveedor</label>
                                                 </th>
 <th scope="col" class="text-right">
     <label class="text-muted mb-0"></label>
@@ -81,7 +81,7 @@
                                             
                                         </thead>
                                         <tbody>
-                                        {{ range .Yield.Products }}
+                                        {{ range .Yield.Materials }}
                                             <tr class="white-space-no-wrap">
                                                 <td class="pr-0">
                                                     <div class="custom-control custom-checkbox custom-control-inline">
@@ -89,31 +89,27 @@
                                                     <label class="custom-control-label" for="customCheck1"></label>
                                                     </div>                                    
                                                 </td>
-                                                <td class="">
-                                                    <div class="active-project-1 d-flex align-items-center mt-0 ">
-                                                        <div class="h-avatar is-medium">
-                                                            <img class="avatar rounded-circle" src="/assets/images/products/{{.Picture}}">
-                                                        </div>
-                                                        <div class="data-content">
-                                                            <div>
-                                                            <span class="font-weight-bold">{{.Name}}</span>                           
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{{.Price}}</td>
                                                 <td>
-                                                    {{.Description}}
+                                                    {{.Name}}
                                                 </td>
-                                                <td>{{.Weight}}</td>
-                                                 <td>
-                                                 {{ range .Category}}
-                                                  {{.Name}} 
-                                                  {{end}}
-                                                  </td>
+                                                <td>
+                                                    {{.Price}}
+                                                </td>
+                                                <td>
+                                                    <div class="cuadrado" style=" width: 50px;           /* Ancho de 150 píxeles */
+  height: 50px;          /* Alto de 150 píxeles */
+  background: {{.Color}};        /* Fondo de color rojo */
+  border: 1px solid #000; /* Borde color negro y de 1 píxel de grosor */"></div>
+                                                </td>
+                                                <td>
+                                                    {{.Weight}}
+                                                </td>
+                                                <td>
+                                                    {{.Supplier}}
+                                                </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        
-                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/products">
+                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/materials">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary mx-4" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

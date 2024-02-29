@@ -7,7 +7,7 @@ import (
 )
 
 type pwReset struct {
-	gorm.Model
+    ProtoModel
 	UserID    uint   `gorm:"not null"`
 	Token     string `gorm:"-"`
 	TokenHash string `gorm:"not null;unique_index"`
@@ -67,7 +67,7 @@ func (pwrg *pwResetGorm) Create(pwr *pwReset) error {
 }
 
 func (pwrg *pwResetGorm) Delete(id uint) error {
-	pwr := pwReset{Model: gorm.Model{ID: id}}
+	pwr := pwReset{ProtoModel: ProtoModel{ID: id}}
 	return pwrg.db.Delete(&pwr).Error
 }
 
