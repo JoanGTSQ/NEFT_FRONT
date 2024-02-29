@@ -114,14 +114,10 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	material.Weight -= totalWeightOrder
+	errorController.InfoLogger.Println(material)
 	err = c.crm.UpdateMaterial(material)
 	if err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
-		c.NewOrder.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		http.Redirect(w, r, "/orders", http.StatusFound)
 		return
 	}
 	http.Redirect(w, r, "/orders", http.StatusFound)

@@ -144,7 +144,7 @@ func (tg *crmGorm) GetAllMaterials() ([]*Material, error) {
 	return materials, nil
 }
 func (tg *crmGorm) UpdateMaterial(material *Material) error {
-	err := tg.db.Update(&material).Error
+	err := tg.db.Save(material).Error
 	if err != nil {
 		return err
 	}
