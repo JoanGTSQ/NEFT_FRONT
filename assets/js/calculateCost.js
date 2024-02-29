@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
 
         var productSelect = document.getElementById('products');
-        var materialSelect = document.getElementById('material');
-        var costInput = document.getElementById('costInput');
-        var sellingPriceInput = document.getElementById('sellingPriceInput');
+        var materialSelect = document.getElementById('materialID');
+        var costInput = document.getElementById('cost');
+        var sellingPriceInput = document.getElementById('sale');
 
         var selectedProductIndices = Array.from(productSelect.selectedOptions).map(option => option.index);
         var selectedMaterialIndex = materialSelect.selectedIndex;

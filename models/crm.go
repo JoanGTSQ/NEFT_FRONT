@@ -10,6 +10,8 @@ type CrmDB interface {
 
 	CreateMaterial(material *Material) error
 	GetAllMaterials() ([]*Material, error)
+	SearchMaterialByID(id int64) (*Material, error)
+	UpdateMaterial(material *Material) error
 
 	CountAllSales() (float64, error)
 	CountAllSalesExpenses() (float64, error)
@@ -17,6 +19,7 @@ type CrmDB interface {
 
 	GetAllProducts() ([]*Product, error)
 	CreateProduct(product *Product) error
+	SearchByID(ID int64) (*Product, error)
 
 	GetAllCategories() ([]*Category, error)
 
@@ -112,6 +115,11 @@ func (tg *crmGorm) GetAllProducts() ([]*Product, error) {
 func (tg *crmGorm) CreateProduct(product *Product) error {
 	return tg.db.Create(product).Error
 }
+func (tg *crmGorm) SearchByID(id int64) (*Product, error) {
+	var product Product
+	err := tg.db.Where("id = ?", id).First(&product).Error
+	return &product, err
+}
 
 // Functions categories
 func (tg *crmGorm) GetAllCategories() ([]*Category, error) {
@@ -134,6 +142,18 @@ func (tg *crmGorm) GetAllMaterials() ([]*Material, error) {
 		return nil, err
 	}
 	return materials, nil
+}
+func (tg *crmGorm) UpdateMaterial(material *Material) error {
+	err := tg.db.Update(&material).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (tg *crmGorm) SearchMaterialByID(id int64) (*Material, error) {
+	var material Material
+	err := tg.db.Where("id = ?", id).First(&material).Error
+	return &material, err
 }
 
 // Functions customer
@@ -163,6 +183,7 @@ type Product struct {
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
 	Weight      int        `gorm:"not null"`
+	Order       []Order    `gorm:"many2many:products_whoknow"`
 }
 type Configurations struct {
 	ProtoModel
@@ -194,14 +215,14 @@ type Customer struct {
 
 type Order struct {
 	ProtoModel
-	MaterialID  int       `gorm:"-" json:"materialid"`
-	Material    Material  `gorm:"foreignkey:materialID" json:"material"`
-	CustomerID  int       `gorm:"" json:"customerid"`
-	Customer    Customer  `gorm:"foreignkey:customerID" json:"customer"`
-	Products    []Product `gorm:"many2many:products_whoknow" json:"products"`
-	TimeMinutes int       `gorm:"not null"`
-	Cost        float64   `gorm:"not null"`
-	Sale        float64   `gorm:"not null"`
-	Sent        bool      `gorm:"not null"`
-	Quality     string    `gorm:"not null"`
+	MaterialID  int        `gorm:"-" json:"materialid"`
+	Material    Material   `gorm:"foreignkey:materialID" json:"material"`
+	CustomerID  int        `gorm:"" json:"customerid"`
+	Customer    Customer   `gorm:"foreignkey:customerID" json:"customer"`
+	Products    []*Product `gorm:"many2many:products_whoknow" json:"products"`
+	TimeMinutes int        `gorm:"not null"`
+	Cost        float64    `gorm:"not null"`
+	Sale        float64    `gorm:"not null"`
+	Sent        bool       `gorm:"not null"`
+	Quality     string     `gorm:"not null"`
 }

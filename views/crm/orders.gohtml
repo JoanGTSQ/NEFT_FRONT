@@ -94,7 +94,7 @@
                                                 </td>
                                                 <td>
                                                     {{ range .Products}}
-                                                    test
+                                                    {{.Name}} 
                                                     {{end}}
                                                 </td>
                                                 <td>
@@ -107,7 +107,11 @@
                                                     {{.Sale}}
                                                 </td>
                                                 <td>
-                                                    {{.Sent}}
+                                                    {{if .Sent}}
+                                                    Sí
+                                                    {{else}}
+                                                    No
+                                                    {{end}}
                                                 </td>
                                                 <td>
                                                     {{.Quality}}

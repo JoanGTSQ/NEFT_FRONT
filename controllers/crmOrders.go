@@ -2,9 +2,12 @@ package controllers
 
 import (
 	"jgt.solutions/errorController"
+	"jgt.solutions/models"
+
 	// "jgt.solutions/models"
-	"jgt.solutions/views"
 	"net/http"
+
+	"jgt.solutions/views"
 )
 
 func (c *Crm) Orders(w http.ResponseWriter, r *http.Request) {
@@ -39,48 +42,87 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	c.NewOrder.Render(w, r, &vd)
 }
 
-// type NewOrderForm struct {
-// 	Name      string  `schema:"name"`
-// 	Email     string  `schema:"email"`
-// 	Direction string  `schema:"direction"`
-// 	Phone     string `schema:"phone"`
-// 	Origin    string     `schema:"origin"`
-// }
+type NewOrderForm struct {
+	Material   int64   `schema:"materialID"`
+	Customer   int64   `schema:"customerID"`
+	Cost       float64 `schema:"cost"`
+	Sale       float64 `schema:"sale"`
+	Origin     string  `schema:"origin"`
+	ProductsID []int64 `schema:"products[]"`
+}
 
 // // Create Process the signup form
 // // POST /new-product
-// func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
-// 	var vd views.Data
-// 	var form NewCustomerForm
-// 	vd.Yield = &form
+func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
+	var vd views.Data
+	var form NewOrderForm
+	vd.Yield = &form
 
-// 	if err := ParseForm(r, &form); err != nil {
-// 		vd.Alert = &views.Alert{
-// 			Level:   views.AlertLvlError,
-// 			Message: views.AlertMsgGeneric,
-// 		}
-// 		c.NewProduct.Render(w, r, &vd)
-// 		errorController.ErrorLogger.Println(err)
-// 		return
-// 	}
-
-// 	customer := models.Customer{
-// 		Name:      form.Name,
-// 		Direction: form.Direction,
-// 		Email:     form.Email,
-// 		Phone:     form.Phone,
-// 		Origin:    form.Origin,
-// 	}
-// 	err := c.crm.CreateCustomer(&customer)
-// 	if err != nil {
-// 		vd.Alert = &views.Alert{
-// 			Level:   views.AlertLvlError,
-// 			Message: views.AlertMsgGeneric,
-// 		}
-// 		c.NewProduct.Render(w, r, &vd)
-// 		errorController.ErrorLogger.Println(err)
-// 		return
-// 	}
-
-// 	http.Redirect(w, r, "/customers", http.StatusFound)
-// }
+	if err := ParseForm(r, &form); err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewProduct.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	errorController.InfoLogger.Println(form)
+	var products []*models.Product
+	var totalWeightOrder int
+	for _, productID := range form.ProductsID {
+		product, err := c.crm.SearchByID(productID)
+		if err != nil {
+			vd.Alert = &views.Alert{
+				Level:   views.AlertLvlError,
+				Message: views.AlertMsgGeneric,
+			}
+			c.NewProduct.Render(w, r, &vd)
+			errorController.ErrorLogger.Println(err)
+			return
+		}
+		totalWeightOrder += product.Weight
+		products = append(products, product)
+	}
+	errorController.InfoLogger.Println(products)
+	order := models.Order{
+		MaterialID: int(form.Material),
+		Cost:       form.Cost,
+		Sale:       form.Sale,
+		Sent:       true,
+		Products:   products,
+		CustomerID: int(form.Customer),
+	}
+	err := c.crm.CreateOrder(&order)
+	if err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewProduct.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	material, err := c.crm.SearchMaterialByID(form.Material)
+	if err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewProduct.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	material.Weight -= totalWeightOrder
+	err = c.crm.UpdateMaterial(material)
+	if err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewOrder.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	http.Redirect(w, r, "/orders", http.StatusFound)
+}
