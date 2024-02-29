@@ -115,10 +115,19 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Genera un número entero aleatorio entre 0 y 100.
-
-	numPicture := rand.Intn(1000)
+    // Verificar si el directorio existe
+    //TODO cambiar por el directorio de la carpeta public
+    if _, err := os.Stat("/home/runner/NEFTFRONT-2/assets/images/products/"); os.IsNotExist(err) {
+        // Si no existe, crear el directorio
+        if err := os.MkdirAll("/home/runner/NEFTFRONT-2/assets/images/products/", os.ModePerm); err != nil {
+            // Manejar el error si no se puede crear el directorio
+            errorController.ErrorLogger.Println("Error al crear directorio:", err)
+            return
+        }
+    }
+	numPicture := rand.Intn(1000000)
 	namePicture := "upload-" + strconv.Itoa(numPicture) + ".png"
-	newPicture, err := os.Create("../assets/images/products/" + namePicture)
+	newPicture, err := os.Create("/home/runner/NEFTFRONT-2/assets/images/products/" + namePicture)
 	if err != nil {
 		errorController.ErrorLogger.Println(err)
 	}
