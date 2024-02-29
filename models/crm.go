@@ -7,17 +7,17 @@ import (
 
 type CrmDB interface {
 	CreateOrder(order *Order) error
+
 	CreateMaterial(material *Material) error
+	GetAllMaterials() ([]*Material, error)
 
 	CountAllSales() (float64, error)
 	CountAllSalesExpenses() (float64, error)
 	GetAllOrders() ([]*Order, error)
 
-    
 	GetAllProducts() ([]*Product, error)
-    CreateProduct(product *Product) error
+	CreateProduct(product *Product) error
 
-    
 	GetAllCategories() ([]*Category, error)
 }
 
@@ -107,8 +107,9 @@ func (tg *crmGorm) GetAllProducts() ([]*Product, error) {
 	return products, nil
 }
 func (tg *crmGorm) CreateProduct(product *Product) error {
-    return tg.db.Create(product).Error
+	return tg.db.Create(product).Error
 }
+
 // Functions categories
 func (tg *crmGorm) GetAllCategories() ([]*Category, error) {
 	var categories []*Category
@@ -123,15 +124,23 @@ func (tg *crmGorm) GetAllCategories() ([]*Category, error) {
 func (tg *crmGorm) CreateMaterial(material *Material) error {
 	return tg.db.Create(material).Error
 }
+func (tg *crmGorm) GetAllMaterials() ([]*Material, error) {
+	var materials []*Material
+	err := tg.db.Find(&materials).Error
+	if err != nil {
+		return nil, err
+	}
+	return materials, nil
+}
 
 type Category struct {
-    ProtoModel
+	ProtoModel
 	Name        string `gorm:"not null"`
 	Description string `gorm:"not null"`
 }
 
 type Product struct {
-    ProtoModel
+	ProtoModel
 	Name        string     `gorm:"not null"`
 	Picture     string     `gorm:"not null"`
 	Price       float64    `gorm:"not null"`
@@ -140,7 +149,7 @@ type Product struct {
 	Weight      int        `gorm:"not null"`
 }
 type Configurations struct {
-    ProtoModel
+	ProtoModel
 	BedTemp      int    `gorm:"not null"`
 	ExtrusorTemp int    `gorm:"not null"`
 	Speed        int    `gorm:"not null"`
@@ -149,16 +158,17 @@ type Configurations struct {
 }
 
 type Material struct {
-    ProtoModel
-	Name  string `gorm:"not null"`
-	Color string `gorm:"not null"`
+	ProtoModel
+	Name           string `gorm:"not null"`
+	Color          string `gorm:"not null"`
+	Supplier       string `gorm:"not null"`
 	Configurations `gorm:"-"`
-	Weight int `gorm:"not null"`
-	Price  int `gorm:"not null"`
+	Weight         int `gorm:"not null"`
+	Price          float64 `gorm:"not null"`
 }
 
 type Customer struct {
-    ProtoModel
+	ProtoModel
 	Name      string `gorm:"not null"`
 	Email     string `gorm:"not null"`
 	Direction string `gorm:"not null"`
@@ -167,7 +177,7 @@ type Customer struct {
 }
 
 type Order struct {
-    ProtoModel
+	ProtoModel
 	MaterialID  int       `gorm:"-" json:"materialid"`
 	Material    Material  `gorm:"foreignkey:materialID" json:"material"`
 	CustomerID  int       `gorm:"" json:"customerid"`

@@ -13,7 +13,7 @@ import (
 
 func NewStatic() *Static {
 	return &Static{
-		NotFound: views.NewView("error404", "static/404"),
+		NotFound: views.NewView("dashboard", "static/404"),
 		Error:    views.NewView("bootstrap", "static/505"),
 	}
 }
