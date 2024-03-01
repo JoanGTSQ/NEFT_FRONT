@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"net/http"
+
 	"jgt.solutions/errorController"
 	"jgt.solutions/models"
 	"jgt.solutions/views"
-	"net/http"
 )
 
 func (c *Crm) Products(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +55,17 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	namePicture, err := uploadPicture(r, "productPicture", "productPicture")
+	namePicture, err := uploadPicture(r, "productPicture", "productPicture", form.Name)
+	if err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewProduct.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	nameStl, err := uploadPicture(r, "productSTL", "productSTL", form.Name)
 	if err != nil {
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
@@ -68,6 +79,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	product := models.Product{
 		Name:        form.Name,
 		Picture:     namePicture,
+		Stl:         nameStl,
 		Price:       form.Price,
 		Description: form.Description,
 		Weight:      form.Weight,

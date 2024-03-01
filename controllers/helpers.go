@@ -3,14 +3,11 @@ package controllers
 import (
 	"errors"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"time"
 
 	"github.com/gorilla/schema"
 )
@@ -36,17 +33,16 @@ func parseValues(values url.Values, dst interface{}) error {
 	return nil
 }
 
-func uploadPicture(r *http.Request, idPicture, typeFile string) (string, error) {
+func uploadPicture(r *http.Request, idPicture, typeFile, name string) (string, error) {
 	file, _, err := r.FormFile(idPicture)
 	if err != nil {
 		return "", err
 	}
 	defer file.Close()
 
-	rrand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
-    projectRoot := filepath.Join(basepath, "../")
+	projectRoot := filepath.Join(basepath, "../")
 	// Genera un número entero aleatorio entre 0 y 100.
 	// Verificar si el directorio existe
 	//TODO cambiar por el directorio de la carpeta public
@@ -57,20 +53,21 @@ func uploadPicture(r *http.Request, idPicture, typeFile string) (string, error) 
 			return "", err
 		}
 	}
-    if _, err := os.Stat(projectRoot + "/assets/stl/products/"); os.IsNotExist(err) {
-        // Si no existe, crear el directorio
-        if err := os.MkdirAll(projectRoot+"/assets/stl/products/", os.ModePerm); err != nil {
-            // Manejar el error si no se puede crear el directorio
-            return "", err
-        }
-    }
-	numFile := rrand.Intn(1000000)
-	nameFile := "upload-" + strconv.Itoa(numFile) + ".png"
+	if _, err := os.Stat(projectRoot + "/assets/stl/products/"); os.IsNotExist(err) {
+		// Si no existe, crear el directorio
+		if err := os.MkdirAll(projectRoot+"/assets/stl/products/", os.ModePerm); err != nil {
+			// Manejar el error si no se puede crear el directorio
+			return "", err
+		}
+	}
+	nameFile := "upload-" + name
 	var path string
 	switch typeFile {
 	case "productPicture":
+		nameFile += ".png"
 		path = "images/products/"
 	case "productSTL":
+		nameFile += ".stl"
 		path = "stl/products/"
 	default:
 		return "", errors.New("typeFile not valid")
@@ -88,6 +85,6 @@ func uploadPicture(r *http.Request, idPicture, typeFile string) (string, error) 
 		return "", err
 	}
 	// write this byte array to our temporary file
-    newFile.Write(fileBytes)
+	newFile.Write(fileBytes)
 	return nameFile, nil
 }

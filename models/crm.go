@@ -179,6 +179,7 @@ type Product struct {
 	ProtoModel
 	Name        string     `gorm:"not null"`
 	Picture     string     `gorm:"not null"`
+	Stl         string     `gorm:"not null"`
 	Price       float64    `gorm:"not null"`
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
@@ -200,7 +201,7 @@ type Material struct {
 	Color          string `gorm:"not null"`
 	Supplier       string `gorm:"not null"`
 	Configurations `gorm:"-"`
-	Weight         float64     `gorm:"not null"`
+	Weight         float64 `gorm:"not null"`
 	Price          float64 `gorm:"not null"`
 }
 
@@ -219,7 +220,7 @@ type Order struct {
 	Material    Material   `gorm:"foreignkey:materialID" json:"material"`
 	CustomerID  int        `gorm:"" json:"customerid"`
 	Customer    Customer   `gorm:"foreignkey:customerID" json:"customer"`
-	Products    []*Product `gorm:"many2many:products_whoknow" json:"products"`
+	Products    []*Product `gorm:"many2many:products_orders" json:"products"`
 	TimeMinutes int        `gorm:"not null"`
 	Cost        float64    `gorm:"not null"`
 	Sale        float64    `gorm:"not null"`
