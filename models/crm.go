@@ -182,7 +182,7 @@ type Product struct {
 	Price       float64    `gorm:"not null"`
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
-	Weight      int        `gorm:"not null"`
+	Weight      float64    `gorm:"not null"`
 	Order       []Order    `gorm:"many2many:products_whoknow"`
 }
 type Configurations struct {
@@ -200,7 +200,7 @@ type Material struct {
 	Color          string `gorm:"not null"`
 	Supplier       string `gorm:"not null"`
 	Configurations `gorm:"-"`
-	Weight         int     `gorm:"not null"`
+	Weight         float64     `gorm:"not null"`
 	Price          float64 `gorm:"not null"`
 }
 

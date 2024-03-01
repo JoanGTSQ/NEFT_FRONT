@@ -4,6 +4,8 @@ import (
 	"github.com/gorilla/schema"
 	"io"
 	"math/rand"
+    "path/filepath"
+    "runtime"
 	"net/http"
 	"net/url"
 	"os"
@@ -40,20 +42,21 @@ func uploadPicture(r *http.Request, idPicture string) (string, error) {
 	defer file.Close()
 
 	rrand := rand.New(rand.NewSource(time.Now().UnixNano()))
-
+	_, b, _, _ := runtime.Caller(0)
+	basepath := filepath.Dir(b)
 	// Genera un número entero aleatorio entre 0 y 100.
 	// Verificar si el directorio existe
 	//TODO cambiar por el directorio de la carpeta public
-	if _, err := os.Stat("/home/runner/NEFTFRONT-2/assets/images/products/"); os.IsNotExist(err) {
+	if _, err := os.Stat(basepath + "../assets/images/products/"); os.IsNotExist(err) {
 		// Si no existe, crear el directorio
-		if err := os.MkdirAll("/home/runner/NEFTFRONT-2/assets/images/products/", os.ModePerm); err != nil {
+		if err := os.MkdirAll(basepath+"../assets/images/products/", os.ModePerm); err != nil {
 			// Manejar el error si no se puede crear el directorio
 			return "", err
 		}
 	}
 	numPicture := rrand.Intn(1000000)
 	namePicture := "upload-" + strconv.Itoa(numPicture) + ".png"
-	newPicture, err := os.Create("/home/runner/NEFTFRONT-2/assets/images/products/" + namePicture)
+	newPicture, err := os.Create(basepath + "../assets/images/products/" + namePicture)
 	if err != nil {
 		return "", err
 	}
@@ -67,5 +70,5 @@ func uploadPicture(r *http.Request, idPicture string) (string, error) {
 	}
 	// write this byte array to our temporary file
 	newPicture.Write(fileBytes)
-    return namePicture, nil
+	return namePicture, nil
 }

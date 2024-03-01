@@ -69,7 +69,7 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	errorController.InfoLogger.Println(form)
 	var products []*models.Product
-	var totalWeightOrder int
+	var totalWeightOrder float64
 	for _, productID := range form.ProductsID {
 		product, err := c.crm.SearchByID(productID)
 		if err != nil {
