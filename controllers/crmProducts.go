@@ -19,8 +19,14 @@ func (c *Crm) Products(w http.ResponseWriter, r *http.Request) {
 	c.ProductsView.Render(w, r, &vd)
 }
 func (c *Crm) FormNewProduct(w http.ResponseWriter, r *http.Request) {
-
-	c.NewProduct.Render(w, r, nil)
+	var vd views.Data
+	var es EssentialData
+	formPicture := FormFile{Id: "productPicture"}
+	formSTL := FormFile{Id: "productSTL"}
+	es.FormFiles = append(es.FormFiles, &formSTL)
+	es.FormFiles = append(es.FormFiles, &formPicture)
+	vd.Yield = es
+	c.NewProduct.Render(w, r, &vd)
 }
 
 type NewProductForm struct {
@@ -48,7 +54,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	namePicture, err := uploadPicture(r, "myFile")
+	namePicture, err := uploadPicture(r, "productPicture", "productPicture")
 	if err != nil {
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,

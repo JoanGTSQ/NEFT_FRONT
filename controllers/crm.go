@@ -34,6 +34,9 @@ type Crm struct {
 	NewOrder      *views.View
 	crm           models.CrmService
 }
+type FormFile struct {
+	Id string
+}
 type EssentialData struct {
 	TotalSales         float64
 	TotalOrderExpenses float64
@@ -41,6 +44,7 @@ type EssentialData struct {
 	Products           []*models.Product
 	Materials          []*models.Material
 	Customers          []*models.Customer
+	FormFiles          []*FormFile
 }
 
 func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {

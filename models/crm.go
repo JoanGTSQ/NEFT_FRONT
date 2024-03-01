@@ -183,7 +183,7 @@ type Product struct {
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
 	Weight      float64    `gorm:"not null"`
-	Order       []Order    `gorm:"many2many:products_whoknow"`
+	Order       []Order    `gorm:"many2many:products_orders"`
 }
 type Configurations struct {
 	ProtoModel

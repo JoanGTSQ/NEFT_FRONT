@@ -1,16 +1,18 @@
 package controllers
 
 import (
-	"github.com/gorilla/schema"
+	"errors"
 	"io"
 	"math/rand"
-    "path/filepath"
-    "runtime"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/schema"
 )
 
 func ParseForm(r *http.Request, dst interface{}) error {
@@ -34,7 +36,7 @@ func parseValues(values url.Values, dst interface{}) error {
 	return nil
 }
 
-func uploadPicture(r *http.Request, idPicture string) (string, error) {
+func uploadPicture(r *http.Request, idPicture, typeFile string) (string, error) {
 	file, _, err := r.FormFile(idPicture)
 	if err != nil {
 		return "", err
@@ -44,23 +46,40 @@ func uploadPicture(r *http.Request, idPicture string) (string, error) {
 	rrand := rand.New(rand.NewSource(time.Now().UnixNano()))
 	_, b, _, _ := runtime.Caller(0)
 	basepath := filepath.Dir(b)
+    projectRoot := filepath.Join(basepath, "../")
 	// Genera un número entero aleatorio entre 0 y 100.
 	// Verificar si el directorio existe
 	//TODO cambiar por el directorio de la carpeta public
-	if _, err := os.Stat(basepath + "../assets/images/products/"); os.IsNotExist(err) {
+	if _, err := os.Stat(projectRoot + "/assets/images/products/"); os.IsNotExist(err) {
 		// Si no existe, crear el directorio
-		if err := os.MkdirAll(basepath+"../assets/images/products/", os.ModePerm); err != nil {
+		if err := os.MkdirAll(projectRoot+"/assets/images/products/", os.ModePerm); err != nil {
 			// Manejar el error si no se puede crear el directorio
 			return "", err
 		}
 	}
-	numPicture := rrand.Intn(1000000)
-	namePicture := "upload-" + strconv.Itoa(numPicture) + ".png"
-	newPicture, err := os.Create(basepath + "../assets/images/products/" + namePicture)
+    if _, err := os.Stat(projectRoot + "/assets/stl/products/"); os.IsNotExist(err) {
+        // Si no existe, crear el directorio
+        if err := os.MkdirAll(projectRoot+"/assets/stl/products/", os.ModePerm); err != nil {
+            // Manejar el error si no se puede crear el directorio
+            return "", err
+        }
+    }
+	numFile := rrand.Intn(1000000)
+	nameFile := "upload-" + strconv.Itoa(numFile) + ".png"
+	var path string
+	switch typeFile {
+	case "productPicture":
+		path = "images/products/"
+	case "productSTL":
+		path = "stl/products/"
+	default:
+		return "", errors.New("typeFile not valid")
+	}
+	newFile, err := os.Create(projectRoot + "/assets/" + path + nameFile)
 	if err != nil {
 		return "", err
 	}
-	defer newPicture.Close()
+	defer newFile.Close()
 
 	// read all of the contents of our uploaded file into a
 	// byte array
@@ -69,6 +88,6 @@ func uploadPicture(r *http.Request, idPicture string) (string, error) {
 		return "", err
 	}
 	// write this byte array to our temporary file
-	newPicture.Write(fileBytes)
-	return namePicture, nil
+    newFile.Write(fileBytes)
+	return nameFile, nil
 }

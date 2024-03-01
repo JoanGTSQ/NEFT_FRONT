@@ -29,7 +29,7 @@ type NewMaterialForm struct {
 	Color    string  `schema:"color"`
 	Supplier string  `schema:"supplier"`
 	Price    float64 `schema:"price"`
-	Weight   float64     `schema:"weight"`
+	Weight   float64 `schema:"weight"`
 }
 
 // Create Process the signup form
