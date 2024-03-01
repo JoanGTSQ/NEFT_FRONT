@@ -33,6 +33,7 @@ func (c *Crm) FormNewProduct(w http.ResponseWriter, r *http.Request) {
 type NewProductForm struct {
 	Name        string  `schema:"name"`
 	Picture     string  `schema:"picture"`
+	Stl         string  `schema:"stl"`
 	Price       float64 `schema:"price"`
 	Description string  `schema:"description"`
 	Weight      float64 `schema:"weight"`
@@ -66,6 +67,16 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	nameStl, err := uploadPicture(r, "productSTL", "productSTL", form.Name)
+	if err != nil {
+		vd.Alert = &views.Alert{
+			Level:   views.AlertLvlError,
+			Message: views.AlertMsgGeneric,
+		}
+		c.NewProduct.Render(w, r, &vd)
+		errorController.ErrorLogger.Println(err)
+		return
+	}
+	nameStl, err := uploadPicture(r, "productSTL", "productSTL")
 	if err != nil {
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
