@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
 	"jgt.solutions/context"
 	"jgt.solutions/errorController"
 
@@ -49,7 +50,7 @@ func (u *Users) LoginNew(w http.ResponseWriter, r *http.Request) {
 
 // New POST /logout
 func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
-  cookie := http.Cookie{
+	cookie := http.Cookie{
 		Name:     "remember_token",
 		Value:    "",
 		Expires:  time.Now(),
@@ -79,9 +80,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		u.NewView.Render(w, r, &vd)
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Parsing Register Form"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		return
 	}
 
@@ -109,10 +108,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: err.Error(),
 		}
-
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Authenticate user from Post form"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		u.NewView.Render(w, r, &vd)
 		return
 	}
@@ -141,9 +137,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Parsing Login Form"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		u.LoginView.Render(w, r, &vd)
 		return
 	}
@@ -164,17 +158,13 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	case nil:
 
 	default:
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Authenticate user from Login form"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		return
 	}
 
 	err = u.signIn(w, user)
 	if err != nil {
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Sign In error generating Remember token"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
@@ -186,7 +176,7 @@ type ResetPwForm struct {
 	Password string `schema:"password"`
 }
 
-//POST /forgot
+// POST /forgot
 func (u *Users) InitiateReset(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var form ResetPwForm
@@ -211,9 +201,7 @@ func (u *Users) InitiateReset(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := u.us.InitiateReset(user.ID)
 	if err != nil {
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Error trying to initiate reset"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
@@ -229,7 +217,7 @@ func (u *Users) InitiateReset(w http.ResponseWriter, r *http.Request) {
 	u.ForgotPwView.Render(w, r, &vd)
 }
 
-//GET /reset
+// GET /reset
 func (u *Users) ResetPw(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var form ResetPwForm
@@ -239,6 +227,8 @@ func (u *Users) ResetPw(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
+		errorController.ErrorLogger.Println(err)
+
 		u.ResetPwView.Render(w, r, &vd)
 		return
 	}
@@ -256,6 +246,8 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
+		errorController.ErrorLogger.Println(err)
+
 		u.ResetPwView.Render(w, r, &vd)
 		return
 	}
@@ -267,9 +259,8 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 				Message: models.ErrSamePasswordReset.Error(),
 			}
 		} else {
-			errorController.WD.Content = err.Error()
-			errorController.WD.Site = "Error completing the password recovering"
-			errorController.WD.SendErrorWHWeb()
+			errorController.ErrorLogger.Println(err)
+
 			vd.Alert = &views.Alert{
 				Level:   views.AlertLvlError,
 				Message: views.AlertMsgGeneric,

@@ -50,10 +50,7 @@ func main() {
 		"flora.db.elephantsql.com", 5432, "mljgqygv", "ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B", "mljgqygv")
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
-		errorController.ErrorLogger.Println("ABORTING...\ndatabase error: ", err)
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Error generating services"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		os.Exit(0)
 	}
 	defer services.Close()

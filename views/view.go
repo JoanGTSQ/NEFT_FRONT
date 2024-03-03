@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"path/filepath"
-  "log"
+
 	"github.com/gorilla/csrf"
 	"jgt.solutions/context"
 	"jgt.solutions/errorController"
@@ -25,10 +26,8 @@ func NewView(layout string, files ...string) *View {
 	files = append(files, layoutFiles()...)
 	t, err := template.New("").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
-    log.Println(err)
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Parsing templates"
-		errorController.WD.SendErrorWHWeb()
+		log.Println(err)
+		errorController.ErrorLogger.Println(err)
 		return nil
 	}
 
@@ -62,19 +61,15 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	vd.User = context.User(r.Context())
 	var buf bytes.Buffer
 	csrfField := csrf.TemplateField(r)
-    tpl := v.Template.Funcs(template.FuncMap{
+	tpl := v.Template.Funcs(template.FuncMap{
 		"csrfField": func() template.HTML {
 			return csrfField
 		},
 	})
-    
+
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
-    log.Println(err)
+		errorController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
-    errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Error executing template"
-		errorController.WD.SendErrorWHWeb()
-		return
 	}
 	io.Copy(w, &buf)
 }
@@ -104,10 +99,7 @@ func (v *View) Flush(w http.ResponseWriter, r *http.Request, data interface{}) {
 	})
 
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
-    
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Error executing template"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
 		return
 	}
@@ -117,9 +109,7 @@ func (v *View) Flush(w http.ResponseWriter, r *http.Request, data interface{}) {
 func layoutFiles() []string {
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
-		errorController.WD.Content = err.Error()
-		errorController.WD.Site = "Error generating template files"
-		errorController.WD.SendErrorWHWeb()
+		errorController.ErrorLogger.Println(err)
 		return nil
 	}
 	return files
