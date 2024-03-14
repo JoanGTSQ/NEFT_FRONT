@@ -8,8 +8,8 @@
                <div class="d-flex align-items-center justify-content-between">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb p-0 mb-0">
-                            <li class="breadcrumb-item"><a href="/products">Productos</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Añadir producto</li>
+                            <li class="breadcrumb-item"><a href="/materials">Materiales</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Añadir material</li>
                         </ol>
                     </nav>
                 </div>
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="col-lg-12 mb-3 d-flex justify-content-between">
-            <h4 class="font-weight-bold d-flex align-items-center">Nuevo producto</h4>
+            <h4 class="font-weight-bold d-flex align-items-center">Nuevo material</h4>
         </div>
         <div class="col-lg-12">
             <div class="card">
@@ -31,8 +31,8 @@
                     <form class="row g-3" enctype="multipart/form-data" action="/new-material" method="POST">
                     {{csrfField}}
                         <div class="col-md-6 mb-3">
-                            <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Product Name</label>
-                            <input type="text" class="form-control" name="name" id="name" placeholder="Enter Product Name">
+                            <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Nombre del material</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Enter Material Name">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="Text5" class="form-label font-weight-bold text-muted text-uppercase">Weight</label>
@@ -56,7 +56,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-end mt-3">
                         <button type="submit" class="btn btn-primary">
-                            Create Product
+                            Create material
                         </button>
                     </div>
                 </div>
