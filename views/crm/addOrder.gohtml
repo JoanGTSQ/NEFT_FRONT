@@ -74,6 +74,9 @@
                                                 <th scope="col">
                                                     <label class="text-muted mb-0" >Venta</label>
                                                 </th>
+                                                <th scope="col">
+                                                    <label class="text-muted mb-0" >Calidad</label>
+                                                </th>
                                             </tr>
                                             
                                         </thead>
@@ -95,12 +98,14 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="1" class="form-control cost" name="cost" id="cost" placeholder="Coste" readonly>
+                                                    <input type="text" value="1" class="form-control cost"  name="products[0][cost]" id="products[0][cost]" placeholder="Coste" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="1" class="form-control sale" name="sale" id="sale" placeholder="Venta" readonly>
+                                                    <input type="text" value="1" class="form-control sale" name="products[0][sale]" id="products[0][sale]" placeholder="Venta" readonly>
                                                 </td>
-
+                                            <td>
+                                                <input type="text" class="form-control" name="products[0][quality]" id="products[0][quality]" placeholder="Quality" >
+                                            </td>
                                             </tr>
                                             
                                         </tbody>
