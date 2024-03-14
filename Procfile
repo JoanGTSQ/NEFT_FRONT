@@ -1,1 +1,0 @@
-web: bin/jgt.solutions -dbDirection="ec2-34-230-153-41.compute-1.amazonaws.com" -dbUser="kcaajkpdnmxdyp" -dbName="d3cumht9f4s4s7" -dbPsswd="21241e3cc12a37f1318f0008669d3a8041274c11ce4abd25b2996453fb1d211f" -enableStats=false
