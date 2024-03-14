@@ -31,53 +31,16 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="font-weight-bold mb-3">Basic Information</h5>
-                    <form class="row g-3" enctype="multipart/form-data" action="/new-order" method="POST">
-                    {{csrfField}}
-                        <div class="col-md-6 mb-3">
-                            <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Product</label>
-                            <select name="products[]" id="products" multiple>
-                                {{range .Yield.Products}}
-                                <option  data-selling-price="{{.Price}}" data-weight="{{.Weight}}" value="{{.ID}}">{{.Name}}</option>
-                                {{end}}
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text5" class="form-label font-weight-bold text-muted text-uppercase">Material</label>
-                            <select name="materialID" id="materialID">
-                                {{range .Yield.Materials}}
-                                <option data-price-per-1000g="{{.Price}}" value="{{.ID}}">{{.Name}} | {{.Color}} | Available: {{.Weight}} g.</option>
-                                {{end}}
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="Text6" class="form-label font-weight-bold text-muted text-uppercase">customer</label>
-                            <select name="customerID" id="customerID">
-                                {{range .Yield.Customers}}
-                                <option value="{{.ID}}">{{.Name}}</option>
-                                {{end}}
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="color" class="form-label font-weight-bold text-muted text-uppercase">Coste</label>
-                            <input type="text" class="form-control" name="cost" id="cost" placeholder="Coste" readOnly>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="color" class="form-label font-weight-bold text-muted text-uppercase">Venta</label>
-                            <input type="text" class="form-control" name="sale" id="sale" placeholder="Venta" readOnly>
-                        </div>
+                    
                 </div>
             </div>
         
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-end mt-3">
-                        <button type="submit" class="btn btn-primary">
-                            Create Product
-                        </button>
-                    </div>
+                    
                 </div>                
             </div>
-            </form>
+            
             <div class="card">
                 <div class="card-body">
                 <div class="col-lg-12 mb-3 d-flex justify-content-between">
@@ -85,23 +48,20 @@
                 </div>
                 <div class="table-responsive">
                 <div id="dynamicRowsContainer">
-    <!-- Existing or dynamically added rows will go here -->
-
+                <form id="productForm" class="row g-3" enctype="multipart/form-data" action="/new-order" method="POST">
+                {{csrfField}}
+                    <div class="col-md-6 mb-3">
+                        <label for="Text6" class="form-label font-weight-bold text-muted text-uppercase">customer</label>
+                        <select name="customerID" id="customerID">
+                            {{range .Yield.Customers}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                    </div>
                                     <table class="table data-table mb-0">
                                         <thead class="table-color-heading">
                                         
-                                            <tr class="text-light">                                                
-                                                <th scope="col" class="pr-0 w-01">
-                                                    <div class="d-flex justify-content-start align-items-end mb-1">
-                                                        <div class="custom-control custom-checkbox custom-control-inline">
-                                                        <input type="checkbox" class="custom-control-input m-0" id="customCheck">
-                                                        <label class="custom-control-label" for="customCheck"></label>
-                                                        </div>
-                                                    </div>                                                    
-                                                </th>
-                                                <th scope="col">
-                                                    <label class="text-muted m-0" >Nombre cliente</label>
-                                                </th>
+                                            <tr class="text-light">              
                                                 <th scope="col">
                                                     <label class="text-muted m-0" >Productos</label>
                                                 </th>
@@ -114,88 +74,56 @@
                                                 <th scope="col">
                                                     <label class="text-muted mb-0" >Venta</label>
                                                 </th>
-                                                <th scope="col" class="text-right">
-                                                    <label class="text-muted mb-0">Enviado</label>
-                                                </th>
-                                                <th scope="col" class="text-right">
-                                                    <label class="text-muted mb-0">Calidad</label>
-                                                </th>
-<th scope="col" class="text-right">
-    <label class="text-muted mb-0"></label>
-</th>
                                             </tr>
                                             
                                         </thead>
                                         <tbody>
                                     
                                             <tr class="white-space-no-wrap">
-                                                <td class="pr-0">
-                                                    <div class="custom-control custom-checkbox custom-control-inline">
-                                                    <input type="checkbox" class="custom-control-input m-0" id="customCheck1">
-                                                    <label class="custom-control-label" for="customCheck1"></label>
-                                                    </div>                                    
-                                                </td>
                                                 <td>
-                                                    <a href="#">hola</a>
-                                                </td>
-                                                <td>
-                                                    <select class="products">
+                                                    <select name="products[0][productID]" id="products[0][productID]" class="products">
                                                         {{range .Yield.Products}}
                                                         <option  data-selling-price="{{.Price}}" data-weight="{{.Weight}}" value="{{.ID}}">{{.Name}}</option>
                                                         {{end}}
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <select name="materialID">
+                                                    <select class="materialID" name="products[0][materialID]" id="products[0][materialID]"  >
                                                         {{range .Yield.Materials}}
                                                         <option data-price-per-1000g="{{.Price}}" value="{{.ID}}">{{.Name}} | {{.Color}} | Available: {{.Weight}} g.</option>
                                                         {{end}}
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    2
+                                                    <input type="text" value="1" class="form-control cost" name="cost" id="cost" placeholder="Coste" readonly>
                                                 </td>
                                                 <td>
-                                                    3
+                                                    <input type="text" value="1" class="form-control sale" name="sale" id="sale" placeholder="Venta" readonly>
                                                 </td>
-                                                <td>
-                                                    4
-                                                </td>
-                                                <td>
-                                                    5
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-end align-items-center">                                                        
-                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/orders">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary mx-4" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                            </svg>
-                                                        </a>
-                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="Print" href="#">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                                            </svg>
-                                                        </a>
-                                                    </div>
-                                                </td>
+
                                             </tr>
                                             
                                         </tbody>
                                     </table>
+                                   
                                     </div>
                                     </div>
                     <div class="d-flex justify-content-end mt-3">
                         <button id="calcularPrecioRelativoBtn" class="btn btn-primary">
                             Calcular precios
                         </button>
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                Create Product
+                            </button>
+                        </div>
+                         </form>
                         <!-- Botón para agregar una nueva fila -->
                 <button type="button" id="addRowBtn" class="btn btn-success">
                     Agregar Producto
                 </button>
                     </div>
                 </div>
-                </form>
             </div>
         </div>
     </div>

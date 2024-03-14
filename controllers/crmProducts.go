@@ -76,16 +76,6 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		errorController.ErrorLogger.Println(err)
 		return
 	}
-	nameStl, err := uploadPicture(r, "productSTL", "productSTL")
-	if err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
-		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
-		return
-	}
 	// return that we have successfully uploaded our file!
 	product := models.Product{
 		Name:        form.Name,

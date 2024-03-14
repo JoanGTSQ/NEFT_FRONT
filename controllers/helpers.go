@@ -88,3 +88,16 @@ func uploadPicture(r *http.Request, idPicture, typeFile, name string) (string, e
 	newFile.Write(fileBytes)
 	return nameFile, nil
 }
+// ProductForm representa un producto seleccionado en el formulario
+type ProductForm struct {
+    ProductID int64 `schema:"productID"`
+    MaterialID int64 `schema:"materialID"`
+}
+
+// NewOrderForm representa el formulario de creación de una nueva orden
+type NewOrderForm struct {
+    Customer int64 `schema:"customerID"`
+    Products []*ProductForm `schema:"products"`
+    Cost float64 `schema:"cost"`
+    Sale float64 `schema:"sale"`
+}

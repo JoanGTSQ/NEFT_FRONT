@@ -19,7 +19,7 @@ type CrmDB interface {
 
 	GetAllProducts() ([]*Product, error)
 	CreateProduct(product *Product) error
-	SearchByID(ID int64) (*Product, error)
+	SearchProductByID(ID int64) (*Product, error)
 
 	GetAllCategories() ([]*Category, error)
 
@@ -68,7 +68,22 @@ type crmValidator struct {
 
 // Functions orders
 func (tg *crmGorm) CreateOrder(order *Order) error {
-	return tg.db.Create(order).Error
+    if err := tg.db.Create(order).Error; err != nil {
+        return err
+    }
+
+    // Asocia los productos con el pedido
+    for _, product := range order.Products {
+        if err := tg.db.Model(order).Association("Products").Append(product).Error; err != nil {
+            return err
+        }
+    }
+
+    return nil
+}
+
+func (tg *crmGorm) CreateOrderProductMaterial(orderProductMaterial []OrderProductMaterial) error {
+	return tg.db.Create(orderProductMaterial).Error
 }
 
 type result struct {
@@ -96,7 +111,7 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 }
 func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	var orders []*Order
-	err := tg.db.Preload("Customer").Preload("Material").Preload("Products").Find(&orders).Error
+	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +130,7 @@ func (tg *crmGorm) GetAllProducts() ([]*Product, error) {
 func (tg *crmGorm) CreateProduct(product *Product) error {
 	return tg.db.Create(product).Error
 }
-func (tg *crmGorm) SearchByID(id int64) (*Product, error) {
+func (tg *crmGorm) SearchProductByID(id int64) (*Product, error) {
 	var product Product
 	err := tg.db.Where("id = ?", id).First(&product).Error
 	return &product, err
@@ -184,8 +199,10 @@ type Product struct {
 	Description string     `gorm:"not null"`
 	Category    []Category `gorm:"many2many:products_category;"`
 	Weight      float64    `gorm:"not null"`
-	Order       []Order    `gorm:"many2many:products_orders"`
+	Quality     string     `gorm:"not null"`
+	TimeMinutes int        `gorm:"not null"`
 }
+
 type Configurations struct {
 	ProtoModel
 	BedTemp      int    `gorm:"not null"`
@@ -214,16 +231,23 @@ type Customer struct {
 	Origin    string `gorm:"not null"`
 }
 
+type OrderProductMaterial struct {
+    ProtoModel
+    OrderID    int      `gorm:"" json:"orderid"`
+    Order      Order    `gorm:"foreignkey:orderID" json:"order"`
+    ProductID  int      `gorm:"" json:"productid"`
+    Product    Product  `gorm:"foreignkey:productID" json:"product"`
+    MaterialID int      `gorm:"" json:"materialid"`
+    Material   Material `gorm:"foreignkey:materialID" json:"material"`
+    Quality    string   `gorm:"not null"`
+}
 type Order struct {
-	ProtoModel
-	MaterialID  int        `gorm:"-" json:"materialid"`
-	Material    Material   `gorm:"foreignkey:materialID" json:"material"`
-	CustomerID  int        `gorm:"" json:"customerid"`
-	Customer    Customer   `gorm:"foreignkey:customerID" json:"customer"`
-	Products    []*Product `gorm:"many2many:products_orders" json:"products"`
-	TimeMinutes int        `gorm:"not null"`
-	Cost        float64    `gorm:"not null"`
-	Sale        float64    `gorm:"not null"`
-	Sent        bool       `gorm:"not null"`
-	Quality     string     `gorm:"not null"`
+    ProtoModel
+    CustomerID  int                     `gorm:"" json:"customerid"`
+    Customer    Customer                `gorm:"foreignkey:customerID"`
+    Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
+    TimeMinutes int                     `gorm:"not null"`
+    Cost        float64                 `gorm:"not null"`
+    Sale        float64                 `gorm:"not null"`
+    Sent        bool                    `gorm:"not null"`
 }

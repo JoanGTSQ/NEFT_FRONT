@@ -97,7 +97,20 @@
                                                 </td>
                                                 <td>
                                                     {{ range .Products}}
-                                                    {{.Name}} <a href="/assets/stl/products/{{.Stl}}" download>Descargar</a>
+                                                    {{.Product.Name}} <a href="/assets/stl/products/{{.Product.Stl}}" download>Descargar</a>
+                                                    
+                                                        <div>
+                                                      <p>{{.Material.Name}} | Color: 
+                                                      <div class="cuadrado" style=" 
+                                                      width: 20px;           
+                                                      height: 20px;          
+                                                      background: {{.Material.Color}};        /* Fondo de color rojo */
+                                                      border: 1px solid #000;">
+                                                      </div>
+                                                      </div>
+                                                    <div>
+                                                    <p>Calidad: {{.Quality}}</p>
+                                                    </div>
                                                     <br>
                                                     {{end}}
                                                 </td>
@@ -118,7 +131,7 @@
                                                     {{end}}
                                                 </td>
                                                 <td>
-                                                    {{.Quality}}
+                                                    
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        

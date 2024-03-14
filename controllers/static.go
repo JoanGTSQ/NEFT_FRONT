@@ -14,7 +14,7 @@ import (
 func NewStatic() *Static {
 	return &Static{
 		NotFound: views.NewView("dashboard", "static/404"),
-		Error:    views.NewView("bootstrap", "static/505"),
+		Error:    views.NewView("dashboard", "static/505"),
 	}
 }
 

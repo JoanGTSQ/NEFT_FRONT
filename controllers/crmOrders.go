@@ -2,10 +2,11 @@ package controllers
 
 import (
 	"jgt.solutions/errorController"
-	"jgt.solutions/models"
 
-	// "jgt.solutions/models"
-	"net/http"
+	"jgt.solutions/models"
+	"net/http"    
+    "fmt"
+    "strconv"
 
 	"jgt.solutions/views"
 )
@@ -42,83 +43,89 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	c.NewOrder.Render(w, r, &vd)
 }
 
-type NewOrderForm struct {
-	Material   int64   `schema:"materialID"`
-	Customer   int64   `schema:"customerID"`
-	Cost       float64 `schema:"cost"`
-	Sale       float64 `schema:"sale"`
-	Origin     string  `schema:"origin"`
-	ProductsID []int64 `schema:"products[]"`
-}
-
-// // Create Process the signup form
-// // POST /new-product
+// CreateOrder procesa el formulario de creación de orden
+// POST /new-order
 func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var form NewOrderForm
+	var totalTime int
+	var totalCost float64
+	var totalSale float64
+
 	vd.Yield = &form
 
+	// Parsear el formulario
 	if err := ParseForm(r, &form); err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
-		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		errorController.ErrorLogger.Println("Error al parsear el formulario:", err)
 		return
 	}
-	errorController.InfoLogger.Println(form)
-	var products []*models.Product
-	var totalWeightOrder float64
-	for _, productID := range form.ProductsID {
-		product, err := c.crm.SearchByID(productID)
-		if err != nil {
-			vd.Alert = &views.Alert{
-				Level:   views.AlertLvlError,
-				Message: views.AlertMsgGeneric,
-			}
-			c.NewProduct.Render(w, r, &vd)
-			errorController.ErrorLogger.Println(err)
-			return
-		}
-		totalWeightOrder += product.Weight
-		products = append(products, product)
-	}
-	errorController.InfoLogger.Println(products)
+
+	var products []*models.OrderProductMaterial
+    	for i := 0; ; i++ {
+    		productID := r.FormValue(fmt.Sprintf("products[%d][productID]", i))
+    		if productID == "" {
+    			break // Salir del bucle si no hay más productos
+    		}
+    		materialID := r.FormValue(fmt.Sprintf("products[%d][materialID]", i))
+            errorController.InfoLogger.Println(productID, materialID)
+    		// Convertir los ID de productos y materiales a int64
+    		productIDInt, err := strconv.ParseInt(productID, 10, 64)
+    		if err != nil {
+    			// Manejar el error
+    			http.Error(w, fmt.Sprintf("Error al obtener el ID del producto %d", i), http.StatusInternalServerError)
+    			return
+    		}
+    		materialIDInt, err := strconv.ParseInt(materialID, 10, 64)
+    		if err != nil {
+    			// Manejar el error
+    			http.Error(w, fmt.Sprintf("Error al obtener el ID del material del producto %d", i), http.StatusInternalServerError)
+    			return
+    		}
+            product, err := c.crm.SearchProductByID(productIDInt)
+            if err != nil {
+                errorController.ErrorLogger.Println("Error al buscar el producto:", err)
+                return // Continuar con el siguiente producto si hay un error
+            }
+
+            material, err := c.crm.SearchMaterialByID(materialIDInt)
+            if err != nil {
+                errorController.ErrorLogger.Println("Error al buscar el material:", err)
+                return // Continuar con el siguiente producto si hay un error
+            }
+            material.Weight -= product.Weight
+            products = append(products, &models.OrderProductMaterial{
+                
+                Product:  *product,
+                Material: *material,
+                Quality:  product.Quality,
+            })
+            totalTime += product.TimeMinutes
+            // TODO: Calcular el costo y la venta adecuadamente
+            totalCost += 1
+            totalSale += product.Price
+            // Actualizar el peso del material
+            err = c.crm.UpdateMaterial(material)
+            if err != nil {
+                errorController.ErrorLogger.Println("Error al actualizar el material:", err)
+                continue // Continuar con el siguiente producto si hay un error
+            }
+    	}
+
+	// Crear la orden en la base de datos
 	order := models.Order{
-		MaterialID: int(form.Material),
-		Cost:       form.Cost,
-		Sale:       form.Sale,
-		Sent:       true,
-		Products:   products,
-		CustomerID: int(form.Customer),
+		CustomerID:  int(form.Customer),
+		Products:    products,
+		TimeMinutes: totalTime,
+		Cost:        totalCost,
+		Sale:        totalSale,
+		Sent:        true,
 	}
+
 	err := c.crm.CreateOrder(&order)
 	if err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
-		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		errorController.ErrorLogger.Println("Error al crear la orden:", err)
 		return
 	}
-	material, err := c.crm.SearchMaterialByID(form.Material)
-	if err != nil {
-		vd.Alert = &views.Alert{
-			Level:   views.AlertLvlError,
-			Message: views.AlertMsgGeneric,
-		}
-		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
-		return
-	}
-	material.Weight -= totalWeightOrder
-	errorController.InfoLogger.Println(material)
-	err = c.crm.UpdateMaterial(material)
-	if err != nil {
-		http.Redirect(w, r, "/orders", http.StatusFound)
-		return
-	}
+
 	http.Redirect(w, r, "/orders", http.StatusFound)
 }
