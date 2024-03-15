@@ -112,7 +112,7 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 }
 func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	var orders []*Order
-	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&orders).Error
+	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Preload("Printer").Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 
 func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
 	var order Order
-	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").First(&order).Error
+	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Preload("Printer").Find(&order).Error
 	return &order, err
 }
 
@@ -209,24 +209,24 @@ type Product struct {
 	Quality     string     `gorm:"not null"`
 	TimeMinutes int        `gorm:"not null"`
 }
-
-type Configurations struct {
+type PrinterMaintenance struct {
 	ProtoModel
-	BedTemp      int    `gorm:"not null"`
-	ExtrusorTemp int    `gorm:"not null"`
-	Speed        int    `gorm:"not null"`
-	CloackFan    bool   `gorm:"not null"`
-	Adhesion     string `gorm:"not null"`
+	ExtrusorChange string `gorm:"not null"`
+	OilChange      string `gorm:"not null"`
+}
+type Printer struct {
+	ProtoModel
+	Name         int                  `gorm:"not null"`
+	Maintenances []PrinterMaintenance `gorm:"many2many:printers_maintenance;"`
 }
 
 type Material struct {
 	ProtoModel
-	Name           string `gorm:"not null"`
-	Color          string `gorm:"not null"`
-	Supplier       string `gorm:"not null"`
-	Configurations `gorm:"-"`
-	Weight         float64 `gorm:"not null"`
-	Price          float64 `gorm:"not null"`
+	Name     string  `gorm:"not null"`
+	Color    string  `gorm:"not null"`
+	Supplier string  `gorm:"not null"`
+	Weight   float64 `gorm:"not null"`
+	Price    float64 `gorm:"not null"`
 }
 
 type Customer struct {
@@ -241,11 +241,13 @@ type Customer struct {
 type OrderProductMaterial struct {
 	ProtoModel
 	OrderID    int      `gorm:"" json:"orderid"`
-	Order      Order    `gorm:"foreignkey:orderID" json:"order"`
-	ProductID  int      `gorm:"" json:"productid"`
-	Product    Product  `gorm:"foreignkey:productID" json:"product"`
-	MaterialID int      `gorm:"" json:"materialid"`
-	Material   Material `gorm:"foreignkey:materialID" json:"material"`
+	Order      Order    `gorm:"foreignkey:orderID"`
+	ProductID  int      `gorm:""`
+	Product    Product  `gorm:"foreignkey:productID"`
+	MaterialID int      `gorm:""`
+	Material   Material `gorm:"foreignkey:materialID"`
+	PrinterID  int      `gorm:""`
+	Printer    Printer  `gorm:"foreignkey:printerID"`
 	Quality    string   `gorm:"not null"`
 }
 type Order struct {
