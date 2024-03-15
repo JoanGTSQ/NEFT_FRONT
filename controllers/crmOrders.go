@@ -17,7 +17,9 @@ func (c *Crm) Orders(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Orders, err = c.crm.GetAllOrders()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+        logController.ErrorLogger.Println(err)
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 	vd.Yield = es
 	c.OrdersView.Render(w, r, &vd)
@@ -27,17 +29,23 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllCustomers()
+	es.Customers, err = c.crm.GetAllUsers()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los productos ", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 	es.Materials, err = c.crm.GetAllMaterials()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los materiales ", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 	vd.Yield = es
 	c.NewOrder.Render(w, r, &vd)
@@ -57,7 +65,8 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	// Parsear el formulario
 	if err := ParseForm(r, &form); err != nil {
 		logController.ErrorLogger.Println("Error al parsear el formulario:", err)
-		return
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 
 	var products []*models.OrderProductMaterial
@@ -73,37 +82,39 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		// Convertir los ID de productos y materiales a int64
 		productIDInt, err := strconv.ParseInt(productID, 10, 64)
 		if err != nil {
-			// Manejar el error
-			http.Error(w, fmt.Sprintf("Error al obtener el ID del producto %d", i), http.StatusInternalServerError)
-			return
+            logController.ErrorLogger.Println("Error al parsear el formulario:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
+            return
 		}
 		materialIDInt, err := strconv.ParseInt(materialID, 10, 64)
 		if err != nil {
-			// Manejar el error
-			http.Error(w, fmt.Sprintf("Error al obtener el ID del material del producto %d", i), http.StatusInternalServerError)
-			return
+            logController.ErrorLogger.Println("Error al parsear el formulario:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
+            return
 		}
 		productCost, err := strconv.ParseFloat(cost, 64)
 		if err != nil {
-			// Manejar el error
-			http.Error(w, fmt.Sprintf("Error al obtener el ID del material del producto %d", i), http.StatusInternalServerError)
-			return
+            logController.ErrorLogger.Println("Error al parsear el formulario:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
+            return
 		}
 		productSale, err := strconv.ParseFloat(sale, 64)
 		if err != nil {
-			// Manejar el error
-			http.Error(w, fmt.Sprintf("Error al obtener el ID del material del producto %d", i), http.StatusInternalServerError)
-			return
+            logController.ErrorLogger.Println("Error al parsear el formulario:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
+            return
 		}
 		product, err := c.crm.SearchProductByID(productIDInt)
 		if err != nil {
 			logController.ErrorLogger.Println("Error al buscar el producto:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
 			return // Continuar con el siguiente producto si hay un error
 		}
 
 		material, err := c.crm.SearchMaterialByID(materialIDInt)
 		if err != nil {
 			logController.ErrorLogger.Println("Error al buscar el material:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
 			return // Continuar con el siguiente producto si hay un error
 		}
 		material.Weight -= product.Weight
@@ -121,6 +132,7 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		err = c.crm.UpdateMaterial(material)
 		if err != nil {
 			logController.ErrorLogger.Println("Error al actualizar el material:", err)
+            http.Redirect(w, r, "/505", http.StatusFound)
 			continue // Continuar con el siguiente producto si hay un error
 		}
 	}
@@ -137,7 +149,8 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	err := c.crm.CreateOrder(&order)
 	if err != nil {
-		logController.ErrorLogger.Println("Error al crear la orden:", err)
+		logController.ErrorLogger.Println("Error al crear el pedido:", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
 		return
 	}
 
@@ -150,13 +163,14 @@ func (c *Crm) ViewSingleOrder(w http.ResponseWriter, r *http.Request) {
     orderIDint, err := strconv.ParseInt(orderID, 10, 64)
     if err != nil {
         // Manejar el error
-        http.Error(w, fmt.Sprintf("Error al obtener el ID del pedido"), http.StatusInternalServerError)
+        logController.ErrorLogger.Println("Error al obtener el ID del pedido:", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
         return
     }
     order, err := c.crm.SearchOrderByID(int(orderIDint))
     if err != nil {
-        // Manejar el error
-        http.Error(w, fmt.Sprintf("Error al obtener el ID del producto"), http.StatusInternalServerError)
+        logController.ErrorLogger.Println("Error al obtener el pedido:", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
         return
     }
     var vd views.Data

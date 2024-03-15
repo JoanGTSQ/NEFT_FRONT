@@ -13,7 +13,8 @@ func (c *Crm) Materials(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Materials, err = c.crm.GetAllMaterials()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los materiales ", err)
+        return
 	}
 	vd.Yield = es
 	c.MaterialsView.Render(w, r, &vd)

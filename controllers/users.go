@@ -62,8 +62,9 @@ func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
 	user.Remember = token
 	err := u.us.Update(user)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
+        logController.ErrorLogger.Println("Error al actualizar el usuario:", err)
+        http.Redirect(w, r, "/505", http.StatusFound)
+        return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }

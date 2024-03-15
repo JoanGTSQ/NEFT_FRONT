@@ -11,9 +11,10 @@ func (c *Crm) Customers(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllCustomers()
+	es.Customers, err = c.crm.GetAllUsers()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
+		return
 	}
 	vd.Yield = es
 	c.CustomersView.Render(w, r, &vd)
@@ -25,11 +26,11 @@ func (c *Crm) FormNewCustomer(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewCustomerForm struct {
-	Name      string  `schema:"name"`
-	Email     string  `schema:"email"`
-	Direction string  `schema:"direction"`
+	Name      string `schema:"name"`
+	Email     string `schema:"email"`
+	Direction string `schema:"direction"`
 	Phone     string `schema:"phone"`
-	Origin    string     `schema:"origin"`
+	Instagram string `schema:"instagram"`
 }
 
 // Create Process the signup form
@@ -49,12 +50,13 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customer := models.Customer{
+	customer := models.User{
 		Name:      form.Name,
 		Direction: form.Direction,
+		Instagram: form.Instagram,
 		Email:     form.Email,
 		Phone:     form.Phone,
-		Origin:    form.Origin,
+		Password:  "12345678",
 	}
 	err := c.crm.CreateCustomer(&customer)
 	if err != nil {
@@ -62,8 +64,9 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		c.NewProduct.Render(w, r, &vd)
+
 		logController.ErrorLogger.Println(err)
+		c.NewProduct.Render(w, r, &vd)
 		return
 	}
 

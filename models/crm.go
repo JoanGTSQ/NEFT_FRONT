@@ -24,8 +24,8 @@ type CrmDB interface {
 
 	GetAllCategories() ([]*Category, error)
 
-	CreateCustomer(material *Customer) error
-	GetAllCustomers() ([]*Customer, error)
+	GetAllUsers() ([]*User, error)
+	CreateCustomer(user *User) error
 }
 
 type CrmService interface {
@@ -121,7 +121,7 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 
 func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
 	var order Order
-	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").First(&order).Error
+	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&order).Error
 	return &order, err
 }
 
@@ -179,16 +179,34 @@ func (tg *crmGorm) SearchMaterialByID(id int64) (*Material, error) {
 }
 
 // Functions customer
-func (tg *crmGorm) CreateCustomer(material *Customer) error {
-	return tg.db.Create(material).Error
-}
-func (tg *crmGorm) GetAllCustomers() ([]*Customer, error) {
-	var customers []*Customer
+
+func (tg *crmGorm) GetAllUsers() ([]*User, error) {
+	var customers []*User
 	err := tg.db.Find(&customers).Error
 	if err != nil {
 		return nil, err
 	}
 	return customers, nil
+}
+func (tg *crmGorm) CreateCustomer(user *User) error {
+	if err := runUserValFuncs(user,
+		passwordRequired,
+		passwordMinLength,
+		bcryptPassword,
+		passwordHashRequired,
+		defaultify,
+		rememberMinBytes,
+		hmacRemember,
+		rememberHashRequired,
+		normalizeEmail,
+		requireEmail,
+		emailFormat,
+	); err != nil {
+		return err
+	}
+
+	return tg.db.Create(user).Error
+
 }
 
 type Category struct {
@@ -209,49 +227,42 @@ type Product struct {
 	Quality     string     `gorm:"not null"`
 	TimeMinutes int        `gorm:"not null"`
 }
-
-type Configurations struct {
+type PrinterMaintenance struct {
 	ProtoModel
-	BedTemp      int    `gorm:"not null"`
-	ExtrusorTemp int    `gorm:"not null"`
-	Speed        int    `gorm:"not null"`
-	CloackFan    bool   `gorm:"not null"`
-	Adhesion     string `gorm:"not null"`
+	ExtrusorChange string `gorm:"not null"`
+	OilChange      string `gorm:"not null"`
+}
+type Printer struct {
+	ProtoModel
+	Name         int                  `gorm:"not null"`
+	Maintenances []PrinterMaintenance `gorm:"many2many:printers_maintenance;"`
 }
 
 type Material struct {
 	ProtoModel
-	Name           string `gorm:"not null"`
-	Color          string `gorm:"not null"`
-	Supplier       string `gorm:"not null"`
-	Configurations `gorm:"-"`
-	Weight         float64 `gorm:"not null"`
-	Price          float64 `gorm:"not null"`
-}
-
-type Customer struct {
-	ProtoModel
-	Name      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
-	Direction string `gorm:"not null"`
-	Phone     string `gorm:"not null"`
-	Origin    string `gorm:"not null"`
+	Name     string  `gorm:"not null"`
+	Color    string  `gorm:"not null"`
+	Supplier string  `gorm:"not null"`
+	Weight   float64 `gorm:"not null"`
+	Price    float64 `gorm:"not null"`
 }
 
 type OrderProductMaterial struct {
 	ProtoModel
 	OrderID    int      `gorm:"" json:"orderid"`
-	Order      Order    `gorm:"foreignkey:orderID" json:"order"`
-	ProductID  int      `gorm:"" json:"productid"`
-	Product    Product  `gorm:"foreignkey:productID" json:"product"`
-	MaterialID int      `gorm:"" json:"materialid"`
-	Material   Material `gorm:"foreignkey:materialID" json:"material"`
+	Order      Order    `gorm:"foreignkey:orderID"`
+	ProductID  int      `gorm:""`
+	Product    Product  `gorm:"foreignkey:productID"`
+	MaterialID int      `gorm:""`
+	Material   Material `gorm:"foreignkey:materialID"`
+	PrinterID  int      `gorm:""`
+	Printer    Printer  `gorm:"foreignkey:printerID"`
 	Quality    string   `gorm:"not null"`
 }
 type Order struct {
 	ProtoModel
 	CustomerID  int                     `gorm:"" json:"customerid"`
-	Customer    Customer                `gorm:"foreignkey:customerID"`
+	Customer    User                    `gorm:"foreignkey:customerID"`
 	Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
 	TimeMinutes int                     `gorm:"not null"`
 	Cost        float64                 `gorm:"not null"`

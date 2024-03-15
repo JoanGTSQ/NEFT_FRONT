@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"html/template"
 	"io"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -26,7 +25,6 @@ func NewView(layout string, files ...string) *View {
 	files = append(files, layoutFiles()...)
 	t, err := template.New("").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
-		log.Println(err)
 		logController.ErrorLogger.Println(err)
 		return nil
 	}
@@ -70,6 +68,7 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
 		logController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
 	io.Copy(w, &buf)
 }

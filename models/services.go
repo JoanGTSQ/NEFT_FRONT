@@ -9,7 +9,7 @@ func NewServices(connectionInfo string) (*Services, error) {
 		return nil, err
 	}
 
-	db.LogMode(true)
+	db.LogMode(false)
 
 	return &Services{
 		User: NewUserService(db),
@@ -29,21 +29,21 @@ func (s *Services) Close() error {
 }
 
 func (s *Services) DestructiveReset() error {
-    // Eliminar las tablas existentes si existen
-    if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Customer{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
-        return err
-    }
+	// Eliminar las tablas existentes si existen
+	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+		return err
+	}
 
-    // Volver a crear todas las tablas y aplicar migraciones
-    return s.AutoMigrate()
+	// Volver a crear todas las tablas y aplicar migraciones
+	return s.AutoMigrate()
 }
 
 func (s *Services) AutoMigrate() error {
-    // Realizar migraciones automáticas para todos los modelos
-    if err := s.db.AutoMigrate(&User{}, &pwReset{}, &Material{}, &Customer{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
-        return err
-    }
-    return nil
+	// Realizar migraciones automáticas para todos los modelos
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 type ProtoModel struct {
