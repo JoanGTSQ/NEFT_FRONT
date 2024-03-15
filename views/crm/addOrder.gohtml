@@ -93,6 +93,9 @@
                                                 <th scope="col">
                                                     <label class="text-muted mb-0" >Calidad</label>
                                                 </th>
+                                                <th scope="col">
+                                                    <label class="text-muted mb-0" >Impresora</label>
+                                                </th>
                                             </tr>
                                             
                                         </thead>
@@ -122,6 +125,12 @@
                                             <td>
                                                 <input type="text" class="form-control" name="products[0][quality]" id="products[0][quality]" placeholder="Quality" >
                                             </td>
+                                            <td>
+                                                <select class="custom-select" name="products[0][printerID]" id="products[0][printerID]"  >
+                                                        {{range .Yield.Printers}}
+                                                        <option value="{{.ID}}">{{.Name}}</option>
+                                                        {{end}}
+                                                    </select>
                                             </tr>
                                             
                                         </tbody>

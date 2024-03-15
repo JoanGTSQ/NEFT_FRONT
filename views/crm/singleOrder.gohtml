@@ -45,7 +45,7 @@
                             <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter Phone" value="{{.Yield.Customer.Phone}}" readonly>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="supplier" class="form-label font-weight-bold text-muted text-uppercase">Origin</label>
+                            <label for="supplier" class="form-label font-weight-bold text-muted text-uppercase">Instagram</label>
                             <input type="text" class="form-control" name="origin" id="origin" placeholder="Enter Origin" value="{{.Yield.Customer.Instagram}}" readonly>
                         </div>
                 </div>
@@ -77,6 +77,9 @@
                                                     <label class="text-muted mb-0" >Calidad</label>
                                                 </th>
                                                 <th scope="col">
+                                                    <label class="text-muted mb-0" >Impresora</label>
+                                                </th>
+                                                <th scope="col">
                                                     
                                                 </th>
                                             </tr>
@@ -106,6 +109,9 @@
                                                 </td>
                                                 <td>
                                                     <input style="text-align: center;" type="text" class="form-control" value="{{.Product.Name}}" readonly>
+                                                </td>
+                                                <td>
+                                                    <input style="text-align: center;" type="text" class="form-control" value="{{.Printer.Name}}" readonly>
                                                 </td>
                                                 <td>
                                                 <a href="/assets/stl/products/{{.Product.Stl}}" download>Descargar<br>STL</a>

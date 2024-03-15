@@ -1,10 +1,11 @@
 package controllers
 
 import (
+	"net/http"
+
 	"jgt.solutions/logController"
 	"jgt.solutions/models"
 	"jgt.solutions/views"
-	"net/http"
 )
 
 func NewCrm(crm models.CrmService) *Crm {
@@ -19,6 +20,8 @@ func NewCrm(crm models.CrmService) *Crm {
 		OrdersView:    views.NewView("dashboard", "crm/orders"),
 		NewOrder:      views.NewView("dashboard", "crm/addOrder"),
 		SingleOrder:   views.NewView("dashboard", "crm/singleOrder"),
+		PrintersView:  views.NewView("dashboard", "crm/printers"),
+		NewPrinter:    views.NewView("dashboard", "crm/addPrinter"),
 		crm:           crm,
 	}
 }
@@ -29,6 +32,8 @@ type Crm struct {
 	NewProduct    *views.View
 	MaterialsView *views.View
 	NewMaterial   *views.View
+	PrintersView  *views.View
+	NewPrinter    *views.View
 	CustomersView *views.View
 	NewCustomer   *views.View
 	OrdersView    *views.View
@@ -47,6 +52,7 @@ type EssentialData struct {
 	Materials          []*models.Material
 	Customers          []*models.User
 	FormFiles          []*FormFile
+	Printers           []*models.Printer
 }
 
 func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {

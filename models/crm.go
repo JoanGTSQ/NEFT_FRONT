@@ -13,6 +13,11 @@ type CrmDB interface {
 	SearchMaterialByID(id int64) (*Material, error)
 	UpdateMaterial(material *Material) error
 
+	CreatePrinter(printer *Printer) error
+	GetAllPrinters() ([]*Printer, error)
+	SearchPrinterByID(id int64) (*Printer, error)
+	UpdatePrinter(printer *Printer) error
+
 	CountAllSales() (float64, error)
 	CountAllSalesExpenses() (float64, error)
 	GetAllOrders() ([]*Order, error)
@@ -112,7 +117,12 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 }
 func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	var orders []*Order
-	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&orders).Error
+	err := tg.db.Preload("Customer").
+		Preload("Products").
+		Preload("Products.Product").
+		Preload("Products.Material").
+		Preload("Products.Printer").
+		Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +131,13 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 
 func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
 	var order Order
-	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&order).Error
+	err := tg.db.Where("id = ?", id).
+		Preload("Customer").
+		Preload("Products").
+		Preload("Products.Product").
+		Preload("Products.Material").
+		Preload("Products.Printer").
+		Find(&order).Error
 	return &order, err
 }
 
@@ -209,6 +225,31 @@ func (tg *crmGorm) CreateCustomer(user *User) error {
 
 }
 
+// Functions material
+func (tg *crmGorm) CreatePrinter(printer *Printer) error {
+	return tg.db.Create(printer).Error
+}
+func (tg *crmGorm) GetAllPrinters() ([]*Printer, error) {
+	var printers []*Printer
+	err := tg.db.Find(&printers).Error
+	if err != nil {
+		return nil, err
+	}
+	return printers, nil
+}
+func (tg *crmGorm) UpdatePrinter(printer *Printer) error {
+	err := tg.db.Save(printer).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (tg *crmGorm) SearchPrinterByID(id int64) (*Printer, error) {
+	var printer Printer
+	err := tg.db.Where("id = ?", id).First(&printer).Error
+	return &printer, err
+}
+
 type Category struct {
 	ProtoModel
 	Name        string `gorm:"not null"`
@@ -234,7 +275,7 @@ type PrinterMaintenance struct {
 }
 type Printer struct {
 	ProtoModel
-	Name         int                  `gorm:"not null"`
+	Name         string               `gorm:"not null"`
 	Maintenances []PrinterMaintenance `gorm:"many2many:printers_maintenance;"`
 }
 

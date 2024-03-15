@@ -132,6 +132,9 @@ func main() {
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.CreateOrder)).Methods("POST")
 	r.HandleFunc("/orders/{id}", requireUseMW.CheckPerm(crmC.ViewSingleOrder)).Methods("GET")
+	r.HandleFunc("/printers", requireUseMW.CheckPerm(crmC.Printers)).Methods("GET")
+	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.FormNewPrinter)).Methods("GET")
+	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.CreatePrinter)).Methods("POST")
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
