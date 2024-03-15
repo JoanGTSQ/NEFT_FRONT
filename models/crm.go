@@ -112,7 +112,7 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 }
 func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	var orders []*Order
-	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Preload("Printer").Find(&orders).Error
+	err := tg.db.Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 
 func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
 	var order Order
-	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Preload("Printer").Find(&order).Error
+	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").Find(&order).Error
 	return &order, err
 }
 
