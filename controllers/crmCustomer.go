@@ -13,7 +13,8 @@ func (c *Crm) Customers(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Customers, err = c.crm.GetAllCustomers()
 	if err != nil {
-		logController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
+		return
 	}
 	vd.Yield = es
 	c.CustomersView.Render(w, r, &vd)
@@ -25,11 +26,11 @@ func (c *Crm) FormNewCustomer(w http.ResponseWriter, r *http.Request) {
 }
 
 type NewCustomerForm struct {
-	Name      string  `schema:"name"`
-	Email     string  `schema:"email"`
-	Direction string  `schema:"direction"`
+	Name      string `schema:"name"`
+	Email     string `schema:"email"`
+	Direction string `schema:"direction"`
 	Phone     string `schema:"phone"`
-	Origin    string     `schema:"origin"`
+	Origin    string `schema:"origin"`
 }
 
 // Create Process the signup form
@@ -62,8 +63,9 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		c.NewProduct.Render(w, r, &vd)
+
 		logController.ErrorLogger.Println(err)
+		c.NewProduct.Render(w, r, &vd)
 		return
 	}
 
