@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/models"
 
 	"jgt.solutions/views"
@@ -52,7 +52,7 @@ func (c *Contact) ContactForm(w http.ResponseWriter, r *http.Request) {
 	var form ContactForm
 	vd.Yield = &form
 	if err := ParseForm(r, &form); err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 	form.Email = strings.ToLower(form.Email)

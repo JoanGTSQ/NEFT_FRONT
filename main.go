@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"jgt.solutions/controllers"
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/middleware"
 	"jgt.solutions/models"
 	"jgt.solutions/rand"
@@ -33,37 +33,36 @@ func init() {
 	flag.StringVar(&portWebServer, "portWebServer", "443", "This will configure the default port in your web server")
 	flag.StringVar(&RedisServer, "redisServer", "127.0.0.1", "This will configure global IP of redis")
 	flag.BoolVar(&debug, "debug", false, "This will export all stats to file log.log")
-	flag.StringVar(&dbDirection, "dbDirection", "127.0.0.1", "This will configure global IP of database")
-	flag.StringVar(&dbUser, "dbUser", "root", "This will configure global user of database")
+	flag.StringVar(&dbDirection, "dbDirection", "", "This will configure global IP of database")
+	flag.StringVar(&dbUser, "dbUser", "", "This will configure global user of database")
 	flag.StringVar(&dbPassword, "dbPsswd", "", "This will configure global psswd of database")
-	flag.StringVar(&dbName, "dbName", "project_dev", "This will configure global name of database")
-
+	flag.StringVar(&dbName, "dbName", "", "This will configure global name of database")
 }
 
 func main() {
 	flag.Parse()
-	errorController.InitLog(true)
+	logController.InitLog(debug)
 
-	errorController.InfoLogger.Println("Starting server")
+	logController.InfoLogger.Println("Starting server")
 
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
-		"flora.db.elephantsql.com", 5432, "mljgqygv", "ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B", "mljgqygv")
+		dbDirection, 5432, dbUser, dbPassword, dbName)
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		os.Exit(0)
 	}
 	defer services.Close()
 
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
-	errorController.InfoLogger.Println("Configuring Database connection")
+	logController.DebugLogger.Println("Configuring Database connection")
 	err = services.AutoMigrate()
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	errorController.InfoLogger.Println("Configuring all controllers")
+	logController.DebugLogger.Println("Configuring all controllers")
 
 	staticC := controllers.NewStatic()
 	crmC := controllers.NewCrm(services.Crm)
@@ -104,7 +103,7 @@ func main() {
 	}
 
 	// Middleware configuration
-	errorController.InfoLogger.Println("Configuring middleware...")
+	logController.DebugLogger.Println("Configuring middleware...")
 
 	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
 	userMW := middleware.User{
@@ -115,7 +114,9 @@ func main() {
 	}
 
 	// Routes configuration
-	errorController.InfoLogger.Println("Applying routes...")
+	logController.DebugLogger.Println("Applying routes...")
+
+	r.Use(middleware.LogMiddlware)
 
 	r.HandleFunc("/", requireUseMW.CheckPerm(crmC.Home)).Methods("GET")
 	r.HandleFunc("/products", requireUseMW.CheckPerm(crmC.Products)).Methods("GET")
@@ -130,6 +131,7 @@ func main() {
 	r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.CreateOrder)).Methods("POST")
+	r.HandleFunc("/orders/{id}", requireUseMW.CheckPerm(crmC.ViewSingleOrder)).Methods("GET")
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
@@ -154,14 +156,10 @@ func main() {
 	if port == "" {
 		port = "9000" // Default port if not specified
 	}
-	errorController.InfoLogger.Println("Running web server on port " + port)
+	logController.InfoLogger.Println("Running web server on port " + port)
 
 	http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
 
-	// go runServer80()
-	// runServerSSL(csrfMw(userMW.Apply(r)))
-	// s.Suffix = " Running web server..."
-	// s.Restart()
 }
 func runServerSSL(handler http.Handler) {
 	log.Println("Starting web server at ::" + portWebServer)

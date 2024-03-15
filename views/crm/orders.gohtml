@@ -91,21 +91,7 @@
                                                 </td>
                                                 <td>
                                                     {{ range .Products}}
-                                                    {{.Product.Name}} <a href="/assets/stl/products/{{.Product.Stl}}" download>Descargar</a>
-                                                    
-                                                        <div>
-                                                      <p>{{.Material.Name}} | Color: 
-                                                      <div class="cuadrado" style=" 
-                                                      width: 20px;           
-                                                      height: 20px;          
-                                                      background: {{.Material.Color}};        /* Fondo de color rojo */
-                                                      border: 1px solid #000;">
-                                                      </div>
-                                                      </div>
-                                                    <div>
-                                                    <p>Calidad: {{.Quality}}</p>
-                                                    </div>
-                                                    <br>
+                                                    1x {{.Product.Name}} 
                                                     {{end}}
                                                 </td>
                                                 <td>
@@ -126,7 +112,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        
-                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/orders">
+                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/orders/{{.ID}}">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary mx-4" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />

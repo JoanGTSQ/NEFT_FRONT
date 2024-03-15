@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/models"
 	"jgt.solutions/views"
 	"net/http"
@@ -18,6 +18,7 @@ func NewCrm(crm models.CrmService) *Crm {
 		NewCustomer:   views.NewView("dashboard", "crm/addCustomer"),
 		OrdersView:    views.NewView("dashboard", "crm/orders"),
 		NewOrder:      views.NewView("dashboard", "crm/addOrder"),
+		SingleOrder:   views.NewView("dashboard", "crm/singleOrder"),
 		crm:           crm,
 	}
 }
@@ -32,6 +33,7 @@ type Crm struct {
 	NewCustomer   *views.View
 	OrdersView    *views.View
 	NewOrder      *views.View
+	SingleOrder   *views.View
 	crm           models.CrmService
 }
 type FormFile struct {
@@ -53,20 +55,20 @@ func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.TotalSales, err = c.crm.CountAllSales()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	es.TotalOrderExpenses, err = c.crm.CountAllSalesExpenses()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 
 	es.Orders, err = c.crm.GetAllOrders()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 
 	vd.Yield = es

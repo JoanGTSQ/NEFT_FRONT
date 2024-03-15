@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 )
 
 type CrmDB interface {
@@ -16,6 +16,7 @@ type CrmDB interface {
 	CountAllSales() (float64, error)
 	CountAllSalesExpenses() (float64, error)
 	GetAllOrders() ([]*Order, error)
+	SearchOrderByID(id int) (*Order, error)
 
 	GetAllProducts() ([]*Product, error)
 	CreateProduct(product *Product) error
@@ -42,7 +43,7 @@ func newCrmGorm(db *gorm.DB) (*crmGorm, error) {
 func NewCrmService(gD *gorm.DB) CrmService {
 	ug, err := newCrmGorm(gD)
 	if err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return nil
 	}
 
@@ -68,18 +69,18 @@ type crmValidator struct {
 
 // Functions orders
 func (tg *crmGorm) CreateOrder(order *Order) error {
-    if err := tg.db.Create(order).Error; err != nil {
-        return err
-    }
+	if err := tg.db.Create(order).Error; err != nil {
+		return err
+	}
 
-    // Asocia los productos con el pedido
-    for _, product := range order.Products {
-        if err := tg.db.Model(order).Association("Products").Append(product).Error; err != nil {
-            return err
-        }
-    }
+	// Asocia los productos con el pedido
+	for _, product := range order.Products {
+		if err := tg.db.Model(order).Association("Products").Append(product).Error; err != nil {
+			return err
+		}
+	}
 
-    return nil
+	return nil
 }
 
 func (tg *crmGorm) CreateOrderProductMaterial(orderProductMaterial []OrderProductMaterial) error {
@@ -94,7 +95,7 @@ func (tg *crmGorm) CountAllSales() (float64, error) {
 	var result result
 	err := tg.db.Table("orders").Select("sum(sale) as total ").Find(&result).Error
 	if err != nil {
-		errorController.ErrorLogger.Println(result)
+		logController.ErrorLogger.Println(result)
 		return 0, err
 	}
 	return result.Total, nil
@@ -103,7 +104,7 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 	var result result
 	err := tg.db.Table("orders").Select("sum(cost) as total ").Find(&result).Error
 	if err != nil {
-		errorController.ErrorLogger.Println(result)
+		logController.ErrorLogger.Println(result)
 		return 0, err
 	}
 
@@ -116,6 +117,12 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 		return nil, err
 	}
 	return orders, nil
+}
+
+func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
+	var order Order
+	err := tg.db.Where("id = ?", id).Preload("Customer").Preload("Products").Preload("Products.Product").Preload("Products.Material").First(&order).Error
+	return &order, err
 }
 
 // Functions Products
@@ -232,22 +239,22 @@ type Customer struct {
 }
 
 type OrderProductMaterial struct {
-    ProtoModel
-    OrderID    int      `gorm:"" json:"orderid"`
-    Order      Order    `gorm:"foreignkey:orderID" json:"order"`
-    ProductID  int      `gorm:"" json:"productid"`
-    Product    Product  `gorm:"foreignkey:productID" json:"product"`
-    MaterialID int      `gorm:"" json:"materialid"`
-    Material   Material `gorm:"foreignkey:materialID" json:"material"`
-    Quality    string   `gorm:"not null"`
+	ProtoModel
+	OrderID    int      `gorm:"" json:"orderid"`
+	Order      Order    `gorm:"foreignkey:orderID" json:"order"`
+	ProductID  int      `gorm:"" json:"productid"`
+	Product    Product  `gorm:"foreignkey:productID" json:"product"`
+	MaterialID int      `gorm:"" json:"materialid"`
+	Material   Material `gorm:"foreignkey:materialID" json:"material"`
+	Quality    string   `gorm:"not null"`
 }
 type Order struct {
-    ProtoModel
-    CustomerID  int                     `gorm:"" json:"customerid"`
-    Customer    Customer                `gorm:"foreignkey:customerID"`
-    Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
-    TimeMinutes int                     `gorm:"not null"`
-    Cost        float64                 `gorm:"not null"`
-    Sale        float64                 `gorm:"not null"`
-    Sent        bool                    `gorm:"not null"`
+	ProtoModel
+	CustomerID  int                     `gorm:"" json:"customerid"`
+	Customer    Customer                `gorm:"foreignkey:customerID"`
+	Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
+	TimeMinutes int                     `gorm:"not null"`
+	Cost        float64                 `gorm:"not null"`
+	Sale        float64                 `gorm:"not null"`
+	Sent        bool                    `gorm:"not null"`
 }

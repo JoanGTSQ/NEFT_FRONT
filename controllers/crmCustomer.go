@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/models"
 	"jgt.solutions/views"
 	"net/http"
@@ -13,7 +13,7 @@ func (c *Crm) Customers(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Customers, err = c.crm.GetAllCustomers()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	vd.Yield = es
 	c.CustomersView.Render(w, r, &vd)
@@ -45,7 +45,7 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 
