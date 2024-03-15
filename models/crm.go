@@ -189,6 +189,7 @@ func (tg *crmGorm) GetAllUsers() ([]*User, error) {
 	return customers, nil
 }
 func (tg *crmGorm) CreateCustomer(user *User) error {
+    Create
     return tg.db.Create(user).Error
 }
 type Category struct {
