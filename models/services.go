@@ -30,7 +30,7 @@ func (s *Services) Close() error {
 
 func (s *Services) DestructiveReset() error {
 	// Eliminar las tablas existentes si existen
-	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{}, &Customer{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
 		return err
 	}
 
@@ -40,7 +40,7 @@ func (s *Services) DestructiveReset() error {
 
 func (s *Services) AutoMigrate() error {
 	// Realizar migraciones automáticas para todos los modelos
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{}, &Customer{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil

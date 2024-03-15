@@ -24,8 +24,8 @@ type CrmDB interface {
 
 	GetAllCategories() ([]*Category, error)
 
-	CreateCustomer(material *Customer) error
-	GetAllCustomers() ([]*Customer, error)
+	GetAllUsers() ([]*User, error)
+    CreateCustomer(user *User) error
 }
 
 type CrmService interface {
@@ -179,18 +179,18 @@ func (tg *crmGorm) SearchMaterialByID(id int64) (*Material, error) {
 }
 
 // Functions customer
-func (tg *crmGorm) CreateCustomer(material *Customer) error {
-	return tg.db.Create(material).Error
-}
-func (tg *crmGorm) GetAllCustomers() ([]*Customer, error) {
-	var customers []*Customer
+
+func (tg *crmGorm) GetAllUsers() ([]*User, error) {
+	var customers []*User
 	err := tg.db.Find(&customers).Error
 	if err != nil {
 		return nil, err
 	}
 	return customers, nil
 }
-
+func (tg *crmGorm) CreateCustomer(user *User) error {
+    return tg.db.Create(user).Error
+}
 type Category struct {
 	ProtoModel
 	Name        string `gorm:"not null"`
@@ -229,15 +229,6 @@ type Material struct {
 	Price    float64 `gorm:"not null"`
 }
 
-type Customer struct {
-	ProtoModel
-	Name      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
-	Direction string `gorm:"not null"`
-	Phone     string `gorm:"not null"`
-	Origin    string `gorm:"not null"`
-}
-
 type OrderProductMaterial struct {
 	ProtoModel
 	OrderID    int      `gorm:"" json:"orderid"`
@@ -253,7 +244,7 @@ type OrderProductMaterial struct {
 type Order struct {
 	ProtoModel
 	CustomerID  int                     `gorm:"" json:"customerid"`
-	Customer    Customer                `gorm:"foreignkey:customerID"`
+	Customer    User                    `gorm:"foreignkey:customerID"`
 	Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
 	TimeMinutes int                     `gorm:"not null"`
 	Cost        float64                 `gorm:"not null"`

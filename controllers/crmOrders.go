@@ -29,7 +29,7 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllCustomers()
+	es.Customers, err = c.crm.GetAllUsers()
 	if err != nil {
 		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
         http.Redirect(w, r, "/505", http.StatusFound)

@@ -45,7 +45,7 @@ type EssentialData struct {
 	Orders             []*models.Order
 	Products           []*models.Product
 	Materials          []*models.Material
-	Customers          []*models.Customer
+	Customers          []*models.User
 	FormFiles          []*FormFile
 }
 

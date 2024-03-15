@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -433,7 +432,7 @@ func (ug *userGorm) Update(user *User) error {
 }
 
 type User struct {
-    ProtoModel
+	ProtoModel
 	Name         string    `gorm:"not null"`
 	Email        string    `gorm:"not null;unique_index"`
 	Password     string    `gorm:"-"`
@@ -444,5 +443,7 @@ type User struct {
 	Enabled      bool      `gorm:"not null;default:false"`
 	Photo        string    `gorm:"default:null"`
 	DOB          time.Time `gorm:""`
+	Phone        string    `gorm:""`
+	Instagram    string    `gorm:""`
+	Direction    string    `gorm:""`
 }
-

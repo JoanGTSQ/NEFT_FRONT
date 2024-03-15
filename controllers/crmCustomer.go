@@ -11,7 +11,7 @@ func (c *Crm) Customers(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllCustomers()
+	es.Customers, err = c.crm.GetAllUsers()
 	if err != nil {
 		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
 		return
@@ -30,7 +30,7 @@ type NewCustomerForm struct {
 	Email     string `schema:"email"`
 	Direction string `schema:"direction"`
 	Phone     string `schema:"phone"`
-	Origin    string `schema:"origin"`
+	Instagram string `schema:"instagram"`
 }
 
 // Create Process the signup form
@@ -50,12 +50,12 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customer := models.Customer{
+	customer := models.User{
 		Name:      form.Name,
 		Direction: form.Direction,
+		Instagram: form.Instagram,
 		Email:     form.Email,
 		Phone:     form.Phone,
-		Origin:    form.Origin,
 	}
 	err := c.crm.CreateCustomer(&customer)
 	if err != nil {
