@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 
 	"fmt"
+	"github.com/gorilla/mux"
 	"jgt.solutions/models"
+	"jgt.solutions/views"
 	"net/http"
 	"strconv"
-
-	"jgt.solutions/views"
 )
 
 func (c *Crm) Orders(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +17,7 @@ func (c *Crm) Orders(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Orders, err = c.crm.GetAllOrders()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	vd.Yield = es
 	c.OrdersView.Render(w, r, &vd)
@@ -29,15 +29,15 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Customers, err = c.crm.GetAllCustomers()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	es.Materials, err = c.crm.GetAllMaterials()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	vd.Yield = es
 	c.NewOrder.Render(w, r, &vd)
@@ -56,7 +56,7 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	// Parsear el formulario
 	if err := ParseForm(r, &form); err != nil {
-		errorController.ErrorLogger.Println("Error al parsear el formulario:", err)
+		logController.ErrorLogger.Println("Error al parsear el formulario:", err)
 		return
 	}
 
@@ -97,13 +97,13 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		}
 		product, err := c.crm.SearchProductByID(productIDInt)
 		if err != nil {
-			errorController.ErrorLogger.Println("Error al buscar el producto:", err)
+			logController.ErrorLogger.Println("Error al buscar el producto:", err)
 			return // Continuar con el siguiente producto si hay un error
 		}
 
 		material, err := c.crm.SearchMaterialByID(materialIDInt)
 		if err != nil {
-			errorController.ErrorLogger.Println("Error al buscar el material:", err)
+			logController.ErrorLogger.Println("Error al buscar el material:", err)
 			return // Continuar con el siguiente producto si hay un error
 		}
 		material.Weight -= product.Weight
@@ -120,7 +120,7 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		// Actualizar el peso del material
 		err = c.crm.UpdateMaterial(material)
 		if err != nil {
-			errorController.ErrorLogger.Println("Error al actualizar el material:", err)
+			logController.ErrorLogger.Println("Error al actualizar el material:", err)
 			continue // Continuar con el siguiente producto si hay un error
 		}
 	}
@@ -137,9 +137,29 @@ func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	err := c.crm.CreateOrder(&order)
 	if err != nil {
-		errorController.ErrorLogger.Println("Error al crear la orden:", err)
+		logController.ErrorLogger.Println("Error al crear la orden:", err)
 		return
 	}
 
 	http.Redirect(w, r, "/orders", http.StatusFound)
+}
+
+func (c *Crm) ViewSingleOrder(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	orderID := vars["id"]
+    orderIDint, err := strconv.ParseInt(orderID, 10, 64)
+    if err != nil {
+        // Manejar el error
+        http.Error(w, fmt.Sprintf("Error al obtener el ID del pedido"), http.StatusInternalServerError)
+        return
+    }
+    order, err := c.crm.SearchOrderByID(int(orderIDint))
+    if err != nil {
+        // Manejar el error
+        http.Error(w, fmt.Sprintf("Error al obtener el ID del producto"), http.StatusInternalServerError)
+        return
+    }
+    var vd views.Data
+    vd.Yield = order
+    c.SingleOrder.Render(w, r, &vd)
 }

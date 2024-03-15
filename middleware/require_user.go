@@ -9,7 +9,7 @@ import (
 	"github.com/mackerelio/go-osstat/cpu"
 	"github.com/mackerelio/go-osstat/memory"
 	"jgt.solutions/context"
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/models"
 )
 
@@ -89,6 +89,15 @@ func (mw *RequireUser) CheckPerm(next http.HandlerFunc) http.HandlerFunc {
 		}
 	})
 }
+func LogMiddlware(next http.Handler) http.Handler{
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Registra la URL y el método HTTP de la solicitud
+        logController.DebugLogger.Printf("Solicitud recibida: %s %s", r.Method, r.URL.Path)
+
+        // Llama al siguiente manejador en la cadena
+        next.ServeHTTP(w, r)
+    })
+}
 
 func PrintStats() {
 	ticker := time.NewTicker(30 * time.Second)
@@ -127,7 +136,7 @@ func PrintStats() {
 
 			textPost := ("\n--------------------")
 
-			errorController.DebugLogger.Println(textPre + currentCPU + totalCPU + currentRAM + freeRAM + textPost)
+			logController.DebugLogger.Println(textPre + currentCPU + totalCPU + currentRAM + freeRAM + textPost)
 		case <-quit:
 			ticker.Stop()
 			return

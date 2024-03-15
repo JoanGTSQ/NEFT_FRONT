@@ -1,5 +1,5 @@
 language = "go"
-run = "go run . -dbDirection=flora.db.elephantsql.com -dbUser=mljgqygv -dbName=mljgqygv -dbPsswd=ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B -debug=true"
+run = "go run . -isProd=false -dbDirection=flora.db.elephantsql.com -dbUser=mljgqygv -dbName=mljgqygv -dbPsswd=ZfVD-ql9hLg4G6NZ6nCxYUKlgQTg3x_B -debug=true"
 entrypoint = "main.go"
 modules = ["go-1.21:v2-20231201-3b22c78"]
 

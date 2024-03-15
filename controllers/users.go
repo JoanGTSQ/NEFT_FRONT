@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"jgt.solutions/context"
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 
 	"jgt.solutions/models"
 	"jgt.solutions/rand"
@@ -80,7 +80,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		u.NewView.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: err.Error(),
 		}
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		u.NewView.Render(w, r, &vd)
 		return
 	}
@@ -137,7 +137,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		u.LoginView.Render(w, r, &vd)
 		return
 	}
@@ -158,13 +158,13 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	case nil:
 
 	default:
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 
 	err = u.signIn(w, user)
 	if err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
@@ -201,7 +201,7 @@ func (u *Users) InitiateReset(w http.ResponseWriter, r *http.Request) {
 	}
 	token, err := u.us.InitiateReset(user.ID)
 	if err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
@@ -227,7 +227,7 @@ func (u *Users) ResetPw(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 
 		u.ResetPwView.Render(w, r, &vd)
 		return
@@ -246,7 +246,7 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 			Level:   views.AlertLvlError,
 			Message: views.AlertMsgGeneric,
 		}
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 
 		u.ResetPwView.Render(w, r, &vd)
 		return
@@ -259,7 +259,7 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 				Message: models.ErrSamePasswordReset.Error(),
 			}
 		} else {
-			errorController.ErrorLogger.Println(err)
+			logController.ErrorLogger.Println(err)
 
 			vd.Alert = &views.Alert{
 				Level:   views.AlertLvlError,

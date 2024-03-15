@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 	"jgt.solutions/models"
 	"jgt.solutions/views"
 )
@@ -14,7 +14,7 @@ func (c *Crm) Products(w http.ResponseWriter, r *http.Request) {
 	var err error
 	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
-		errorController.ErrorLogger.Println("nope ", err)
+		logController.ErrorLogger.Println("nope ", err)
 	}
 	vd.Yield = es
 	c.ProductsView.Render(w, r, &vd)
@@ -52,7 +52,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 	nameStl, err := uploadPicture(r, "productSTL", "productSTL", form.Name)
@@ -73,7 +73,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 	// return that we have successfully uploaded our file!
@@ -92,7 +92,7 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 			Message: views.AlertMsgGeneric,
 		}
 		c.NewProduct.Render(w, r, &vd)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return
 	}
 

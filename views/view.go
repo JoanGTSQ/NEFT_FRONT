@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"jgt.solutions/context"
-	"jgt.solutions/errorController"
+	"jgt.solutions/logController"
 )
 
 var (
@@ -27,7 +27,7 @@ func NewView(layout string, files ...string) *View {
 	t, err := template.New("").Funcs(funcMap).ParseFiles(files...)
 	if err != nil {
 		log.Println(err)
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return nil
 	}
 
@@ -68,7 +68,7 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 	})
 
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
 	}
 	io.Copy(w, &buf)
@@ -99,7 +99,7 @@ func (v *View) Flush(w http.ResponseWriter, r *http.Request, data interface{}) {
 	})
 
 	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
 		return
 	}
@@ -109,7 +109,7 @@ func (v *View) Flush(w http.ResponseWriter, r *http.Request, data interface{}) {
 func layoutFiles() []string {
 	files, err := filepath.Glob(LayoutDir + "*" + TemplateExt)
 	if err != nil {
-		errorController.ErrorLogger.Println(err)
+		logController.ErrorLogger.Println(err)
 		return nil
 	}
 	return files
