@@ -137,25 +137,7 @@
                 </div>
             </div>
         </div>
-
-
-        <div id="exampleRow" style="display: none;">
-    <div class="col-md-6 mb-3">
-        <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Product</label>
-        <select name="products[]" multiple>
-            {{range .Yield.Products}}
-            <option data-selling-price="{{.Price}}" data-weight="{{.Weight}}" value="{{.ID}}">{{.Name}}</option>
-            {{end}}
-        </select>
-    </div>
-    <div class="col-md-6 mb-3">
-        <label for="Text5" class="form-label font-weight-bold text-muted text-uppercase">Material</label>
-        <select name="materialID" id="materialID">
-            {{range .Yield.Materials}}
-            <option data-price-per-1000g="{{.Price}}" value="{{.ID}}">{{.Name}} | {{.Color}} | Available: {{.Weight}} g.</option>
-            {{end}}
-        </select>
-    </div>
+        </div>
     <!-- ... Otros campos de la fila ... -->
 </div>
 <!-- Botón para agregar una nueva fila -->

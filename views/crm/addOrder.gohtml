@@ -23,41 +23,57 @@
         </div>
         <div class="col-lg-12 mb-3 d-flex justify-content-between">
             <h4 class="font-weight-bold d-flex align-items-center">Nuevo pedido</h4>
-            {{if .Alert}}
-                                    {{template "alert" .Alert}}
-                                {{end}}
+            
         </div>
-        <div class="col-lg-12">
+        <form id="productForm" class="row g-3" enctype="multipart/form-data" action="/new-order" method="POST">
+        {{csrfField}}
+        <div class="col-lg-12">        
             <div class="card">
+            {{if .Alert}}
+                {{template "alert" .Alert}}
+            {{end}}
                 <div class="card-body">
-                    <h5 class="font-weight-bold mb-3">Basic Information</h5>
-                    
+                    <button type="button" id="addRowBtn" class="btn btn-success">
+                        Agregar Producto
+                    </button>
+                    <button id="calcularPrecioRelativoBtn" class="btn btn-primary">
+                        Calcular precios
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Crear pedido
+                    </button>
+                </div>   
                 </div>
             </div>
-        
+            <div class="col-lg-12">        
             <div class="card">
+            {{if .Alert}}
+                {{template "alert" .Alert}}
+            {{end}}
                 <div class="card-body">
+                <h4>Cliente</h4>
+                <div class="col-md-6 mb-3">
                     
-                </div>                
+                    <select name="customerID" id="customerID" class="custom-select" aria-label="Default select example">
+                        <option disabled>Seleccione un cliente</option>
+                        {{range .Yield.Customers}}
+                        <option value="{{.ID}}">Cliente {{.ID}}: {{.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+                </div>   
+
             </div>
-            
             <div class="card">
                 <div class="card-body">
                 <div class="col-lg-12 mb-3 d-flex justify-content-between">
-                    <h4 class="font-weight-bold d-flex align-items-center">Nuevo pedido</h4>
+                    <h4 class="font-weight-bold d-flex align-items-center">Productos</h4>
                 </div>
                 <div class="table-responsive">
                 <div id="dynamicRowsContainer">
-                <form id="productForm" class="row g-3" enctype="multipart/form-data" action="/new-order" method="POST">
-                {{csrfField}}
-                    <div class="col-md-6 mb-3">
-                        <label for="Text6" class="form-label font-weight-bold text-muted text-uppercase">customer</label>
-                        <select name="customerID" id="customerID">
-                            {{range .Yield.Customers}}
-                            <option value="{{.ID}}">{{.Name}}</option>
-                            {{end}}
-                        </select>
-                    </div>
+                
+                
+                    
                                     <table class="table data-table mb-0">
                                         <thead class="table-color-heading">
                                         
@@ -84,14 +100,14 @@
                                     
                                             <tr class="white-space-no-wrap">
                                                 <td>
-                                                    <select name="products[0][productID]" id="products[0][productID]" class="products">
+                                                    <select class="custom-select products" name="products[0][productID]" id="products[0][productID]" >
                                                         {{range .Yield.Products}}
                                                         <option  data-selling-price="{{.Price}}" data-weight="{{.Weight}}" value="{{.ID}}">{{.Name}}</option>
                                                         {{end}}
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <select class="materialID" name="products[0][materialID]" id="products[0][materialID]"  >
+                                                    <select class="custom-select materialID" name="products[0][materialID]" id="products[0][materialID]"  >
                                                         {{range .Yield.Materials}}
                                                         <option data-price-per-1000g="{{.Price}}" value="{{.ID}}">{{.Name}} | {{.Color}} | Available: {{.Weight}} g.</option>
                                                         {{end}}
@@ -101,7 +117,7 @@
                                                     <input type="text" value="1" class="form-control cost"  name="products[0][cost]" id="products[0][cost]" placeholder="Coste" readonly>
                                                 </td>
                                                 <td>
-                                                    <input type="text" value="1" class="form-control sale" name="products[0][sale]" id="products[0][sale]" placeholder="Venta" readonly>
+                                                    <input type="text" value="1" class="form-control sale" name="products[0][sale]" id="products[0][sale]" placeholder="Venta">
                                                 </td>
                                             <td>
                                                 <input type="text" class="form-control" name="products[0][quality]" id="products[0][quality]" placeholder="Quality" >
@@ -114,23 +130,15 @@
                                     </div>
                                     </div>
                     <div class="d-flex justify-content-end mt-3">
-                        <button id="calcularPrecioRelativoBtn" class="btn btn-primary">
-                            Calcular precios
-                        </button>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary">
-                                Create Product
-                            </button>
-                        </div>
+                        
                          </form>
                         <!-- Botón para agregar una nueva fila -->
-                <button type="button" id="addRowBtn" class="btn btn-success">
-                    Agregar Producto
-                </button>
+                
                     </div>
                 </div>
             </div>
         </div>
+        
     </div>
 </div>
 
