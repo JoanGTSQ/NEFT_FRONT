@@ -56,6 +56,7 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 		Instagram: form.Instagram,
 		Email:     form.Email,
 		Phone:     form.Phone,
+		Password:  "12345678",
 	}
 	err := c.crm.CreateCustomer(&customer)
 	if err != nil {
