@@ -189,7 +189,24 @@ func (tg *crmGorm) GetAllUsers() ([]*User, error) {
 	return customers, nil
 }
 func (tg *crmGorm) CreateCustomer(user *User) error {
+	if err := runUserValFuncs(user,
+		passwordRequired,
+		passwordMinLength,
+		bcryptPassword,
+		passwordHashRequired,
+		defaultify,
+		rememberMinBytes,
+		hmacRemember,
+		rememberHashRequired,
+		normalizeEmail,
+		requireEmail,
+		emailFormat,
+	); err != nil {
+		return err
+	}
+
 	return tg.db.Create(user).Error
+
 }
 
 type Category struct {

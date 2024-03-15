@@ -40,7 +40,7 @@
                         Calcular precios
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        Create Order
+                        Crear pedido
                     </button>
                 </div>   
                 </div>
@@ -100,14 +100,14 @@
                                     
                                             <tr class="white-space-no-wrap">
                                                 <td>
-                                                    <select class="custom-select" name="products[0][productID]" id="products[0][productID]" class="products">
+                                                    <select class="custom-select products" name="products[0][productID]" id="products[0][productID]" >
                                                         {{range .Yield.Products}}
                                                         <option  data-selling-price="{{.Price}}" data-weight="{{.Weight}}" value="{{.ID}}">{{.Name}}</option>
                                                         {{end}}
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <select class="custom-select" class="materialID" name="products[0][materialID]" id="products[0][materialID]"  >
+                                                    <select class="custom-select materialID" name="products[0][materialID]" id="products[0][materialID]"  >
                                                         {{range .Yield.Materials}}
                                                         <option data-price-per-1000g="{{.Price}}" value="{{.ID}}">{{.Name}} | {{.Color}} | Available: {{.Weight}} g.</option>
                                                         {{end}}
