@@ -25,7 +25,7 @@ type CrmDB interface {
 	GetAllCategories() ([]*Category, error)
 
 	GetAllUsers() ([]*User, error)
-    CreateCustomer(user *User) error
+	CreateCustomer(user *User) error
 }
 
 type CrmService interface {
@@ -189,9 +189,9 @@ func (tg *crmGorm) GetAllUsers() ([]*User, error) {
 	return customers, nil
 }
 func (tg *crmGorm) CreateCustomer(user *User) error {
-    Create
-    return tg.db.Create(user).Error
+	return tg.db.Create(user).Error
 }
+
 type Category struct {
 	ProtoModel
 	Name        string `gorm:"not null"`
