@@ -10,13 +10,12 @@ import (
 	"github.com/mackerelio/go-osstat/memory"
 	"jgt.solutions/context"
 	"jgt.solutions/logController"
-	"jgt.solutions/models"
 )
 
 var mySigningKey = []byte("captainjacksparrowsayshi")
 
 type User struct {
-	models.UserService
+	// models.UserService
 }
 
 func (mw *User) Apply(next http.Handler) http.Handler {
@@ -26,20 +25,20 @@ func (mw *User) Apply(next http.Handler) http.Handler {
 func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("remember_token")
-		if err != nil {
-			next(w, r)
-			return
-		}
-		user, err := mw.UserService.ByRemember(cookie.Value)
-		if err != nil {
-			next(w, r)
-			return
-		}
+		// cookie, err := r.Cookie("remember_token")
+		// if err != nil {
+		// 	next(w, r)
+		// 	return
+		// }
+		// user, err := mw.UserService.ByRemember(cookie.Value)
+		// if err != nil {
+		// 	next(w, r)
+		// 	return
+		// }
 
-		ctx := r.Context()
-		ctx = context.WithUser(ctx, user)
-		r = r.WithContext(ctx)
+		// ctx := r.Context()
+		// ctx = context.WithUser(ctx, user)
+		// r = r.WithContext(ctx)
 		next(w, r)
 	})
 }
@@ -75,18 +74,18 @@ func (mw *RequireUser) CheckUser(next http.HandlerFunc) http.HandlerFunc {
 
 func (mw *RequireUser) CheckPerm(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user := context.User(r.Context())
+		// user := context.User(r.Context())
 
-		if user == nil {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
-		if user.PermLevel == "Admin" || user.PermLevel == "Worker" {
-			next(w, r)
-			return
-		} else {
-			http.Redirect(w, r, "/404", http.StatusFound)
-		}
+		// if user == nil {
+		// 	http.Redirect(w, r, "/login", http.StatusFound)
+		// 	return
+		// }
+		// if user.PermLevel == "Admin" || user.PermLevel == "Worker" {
+		// 	next(w, r)
+		// 	return
+		// } else {
+		// 	http.Redirect(w, r, "/404", http.StatusFound)
+		// }
 	})
 }
 func LogMiddlware(next http.Handler) http.Handler{

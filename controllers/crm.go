@@ -48,11 +48,8 @@ type EssentialData struct {
 	TotalSales         float64
 	TotalOrderExpenses float64
 	Orders             []*models.Order
-	Products           []*models.Product
-	Materials          []*models.Material
 	Customers          []*models.User
 	FormFiles          []*FormFile
-	Printers           []*models.Printer
 }
 
 func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
@@ -64,19 +61,16 @@ func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
 		logController.ErrorLogger.Println("no se han podido obtener todas las ventas ", err)
 		return
 	}
-	es.TotalOrderExpenses, err = c.crm.CountAllSalesExpenses()
-	if err != nil {
-		logController.ErrorLogger.Println("no se han podido obtener todas los costes ", err)
-	}
+	// es.TotalOrderExpenses, err = c.crm.CountAllSalesExpenses()
+	// if err != nil {
+	// 	logController.ErrorLogger.Println("no se han podido obtener todas los costes ", err)
+	// }
 
-	es.Orders, err = c.crm.GetAllOrders()
-	if err != nil {
-		logController.ErrorLogger.Println("no se han podido obtener todos los pedidos ", err)
-	}
-	es.Products, err = c.crm.GetAllProducts()
-	if err != nil {
-		logController.ErrorLogger.Println("no se han podido obtener todos los productos ", err)
-	}
+	// es.Orders, err = c.crm.GetAllOrders()
+	// if err != nil {
+	// 	logController.ErrorLogger.Println("no se han podido obtener todos los pedidos ", err)
+	// }
+
 
 	vd.Yield = es
 	c.HomeDashboard.Render(w, r, &vd)

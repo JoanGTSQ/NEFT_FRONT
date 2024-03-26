@@ -56,16 +56,17 @@ func (v *View) Render(w http.ResponseWriter, r *http.Request, data interface{}) 
 		vd.Yield = d
 	}
 	vd.Active = r.URL.Path
-	vd.User = context.User(r.Context())
+	// TODO do it again
+	// vd.User = context.User(r.Context())
 	var buf bytes.Buffer
-	csrfField := csrf.TemplateField(r)
-	tpl := v.Template.Funcs(template.FuncMap{
-		"csrfField": func() template.HTML {
-			return csrfField
-		},
-	})
+	// csrfField := csrf.TemplateField(r)
+	// tpl := v.Template.Funcs(template.FuncMap{
+	// 	"csrfField": func() template.HTML {
+	// 		return csrfField
+	// 	},
+	// })
 
-	if err := tpl.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
+	if err := v.Template.ExecuteTemplate(&buf, v.Layout, vd); err != nil {
 		logController.ErrorLogger.Println(err)
 		http.Redirect(w, r, "/505", http.StatusFound)
 		return

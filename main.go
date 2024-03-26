@@ -7,14 +7,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"jgt.solutions/controllers"
 	"jgt.solutions/logController"
 	"jgt.solutions/middleware"
 	"jgt.solutions/models"
-	"jgt.solutions/rand"
 )
 
 var (
@@ -63,12 +61,10 @@ func main() {
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
-	return
 	logController.DebugLogger.Println("Configuring all controllers")
 
 	staticC := controllers.NewStatic()
 	crmC := controllers.NewCrm(services.Crm)
-	userC := controllers.NewUsers(services.User)
 
 	r := mux.NewRouter()
 	cssHandler := http.FileServer(http.Dir("./css/"))
@@ -99,58 +95,58 @@ func main() {
 	assetsAppHandler = http.StripPrefix("/app-assets/", assetsAppHandler)
 	r.PathPrefix("/app-assets/").Handler(assetsAppHandler)
 
-	b, err := rand.Bytes(32)
-	if err != nil {
-		return
-	}
+	// b, err := rand.Bytes(32)
+	// if err != nil {
+	// 	return
+	// }
 
 	// Middleware configuration
 	logController.DebugLogger.Println("Configuring middleware...")
 
-	csrfMw := csrf.Protect(b, csrf.Secure(isProd))
-	userMW := middleware.User{
-		UserService: services.User,
-	}
-	requireUseMW := middleware.RequireUser{
-		User: userMW,
-	}
+	// csrfMw := csrf.Protect(b, csrf.Secure(isProd))
+	// userMW := middleware.User{
+	// 	// UserService: services.User,
+	// }
+	// requireUseMW := middleware.RequireUser{
+	// 	User: userMW,
+	// }
 
 	// Routes configuration
 	logController.DebugLogger.Println("Applying routes...")
 
 	r.Use(middleware.LogMiddlware)
 
-	r.HandleFunc("/", requireUseMW.CheckPerm(crmC.Home)).Methods("GET")
-	r.HandleFunc("/products", requireUseMW.CheckPerm(crmC.Products)).Methods("GET")
-	r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.FormNewProduct)).Methods("GET")
-	r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.CreateProduct)).Methods("POST")
-	r.HandleFunc("/materials", requireUseMW.CheckPerm(crmC.Materials)).Methods("GET")
-	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.FormNewMaterial)).Methods("GET")
-	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.CreateMaterial)).Methods("POST")
-	r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.Customers)).Methods("GET")
-	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.FormNewCustomer)).Methods("GET")
-	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.CreateCustomer)).Methods("POST")
-	r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
-	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
-	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.CreateOrder)).Methods("POST")
-	r.HandleFunc("/orders/{id}", requireUseMW.CheckPerm(crmC.ViewSingleOrder)).Methods("GET")
-	r.HandleFunc("/printers", requireUseMW.CheckPerm(crmC.Printers)).Methods("GET")
-	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.FormNewPrinter)).Methods("GET")
-	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.CreatePrinter)).Methods("POST")
+	r.HandleFunc("/", crmC.Home).Methods("GET")
+	// r.HandleFunc("/products", requireUseMW.CheckPerm(crmC.Products)).Methods("GET")
+	// r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.FormNewProduct)).Methods("GET")
+	// r.HandleFunc("/new-product", requireUseMW.CheckPerm(crmC.CreateProduct)).Methods("POST")
+	// r.HandleFunc("/materials", requireUseMW.CheckPerm(crmC.Materials)).Methods("GET")
+	// r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.FormNewMaterial)).Methods("GET")
+	// r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.CreateMaterial)).Methods("POST")
+	// r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.Customers)).Methods("GET")
+	// r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.FormNewCustomer)).Methods("GET")
+	// r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.CreateCustomer)).Methods("POST")
+	// r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
+	// r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
+	// r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.CreateOrder)).Methods("POST")
+	// r.HandleFunc("/orders/{id}", requireUseMW.CheckPerm(crmC.ViewSingleOrder)).Methods("GET")
+	// r.HandleFunc("/printers", requireUseMW.CheckPerm(crmC.Printers)).Methods("GET")
+	// r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.FormNewPrinter)).Methods("GET")
+	// r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.CreatePrinter)).Methods("POST")
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
 	// Login And Register
 
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.New)).Methods("GET")
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.Create)).Methods("POST")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.LoginNew)).Methods("GET")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.Login)).Methods("POST")
-	r.HandleFunc("/logout", userC.Logout).Methods("POST")
-	r.Handle("/forgot", userC.ForgotPwView).Methods("GET")
-	r.HandleFunc("/forgot", userC.InitiateReset).Methods("POST")
-	r.HandleFunc("/reset", userC.ResetPw).Methods("GET")
-	r.HandleFunc("/reset", userC.CompleteReset).Methods("POST")
+	// r.HandleFunc("/signup", requireUseMW.CheckUser(userC.New)).Methods("GET")
+	// r.HandleFunc("/signup", requireUseMW.CheckUser(userC.Create)).Methods("POST")
+	// r.HandleFunc("/login", requireUseMW.CheckUser(userC.LoginNew)).Methods("GET")
+	// r.HandleFunc("/login", requireUseMW.CheckUser(userC.Login)).Methods("POST")
+	// r.HandleFunc("/logout", userC.Logout).Methods("POST")
+	// r.Handle("/forgot", userC.ForgotPwView).Methods("GET")
+	// r.HandleFunc("/forgot", userC.InitiateReset).Methods("POST")
+	// r.HandleFunc("/reset", userC.ResetPw).Methods("GET")
+	// r.HandleFunc("/reset", userC.CompleteReset).Methods("POST")
 
 	// Start server
 
@@ -163,7 +159,7 @@ func main() {
 	}
 	logController.InfoLogger.Println("Running web server on port " + port)
 
-	http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
+	http.ListenAndServe(":"+port, r)
 
 }
 func runServerSSL(handler http.Handler) {
