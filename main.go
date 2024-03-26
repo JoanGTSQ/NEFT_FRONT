@@ -45,9 +45,11 @@ func main() {
 
 	logController.InfoLogger.Println("Starting server")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
-		dbDirection, 5432, dbUser, dbPassword, dbName)
-	services, err := models.NewServices(psqlInfo)
+	//psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
+	//dbDirection, 5432, dbUser, dbPassword, dbName)
+	dsn := "qaiq735:PuroVici!1@tcp(qaiq735.protogt.com:3306)/qaiq735?charset=utf8mb4&parseTime=True&loc=Local"
+
+	services, err := models.NewServices(dsn)
 	if err != nil {
 		logController.ErrorLogger.Println(err)
 		os.Exit(0)
@@ -57,11 +59,11 @@ func main() {
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
 	logController.DebugLogger.Println("Configuring Database connection")
-	err = services.AutoMigrate()
-	if err != nil {
-		fmt.Println(err)
-	}
-
+	// err = services.AutoMigrate()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	return
 	logController.DebugLogger.Println("Configuring all controllers")
 
 	staticC := controllers.NewStatic()

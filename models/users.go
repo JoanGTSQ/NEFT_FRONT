@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"jgt.solutions/hash"
 	"jgt.solutions/rand"

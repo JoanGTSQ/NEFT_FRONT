@@ -1,10 +1,14 @@
 package models
 
-import "github.com/jinzhu/gorm"
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+	"time"
+    _ "github.com/go-sql-driver/mysql"
+)
 
 func NewServices(connectionInfo string) (*Services, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
+
+	db, err := gorm.Open("mysql", connectionInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +34,7 @@ func (s *Services) Close() error {
 
 func (s *Services) DestructiveReset() error {
 	// Eliminar las tablas existentes si existen
-	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
 		return err
 	}
 
@@ -40,7 +44,7 @@ func (s *Services) DestructiveReset() error {
 
 func (s *Services) AutoMigrate() error {
 	// Realizar migraciones automáticas para todos los modelos
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{}, &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil
