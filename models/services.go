@@ -1,14 +1,17 @@
 package models
 
 import "github.com/jinzhu/gorm"
+import _ "github.com/go-sql-driver/mysql"
 import "time"
 
 func NewServices(connectionInfo string) (*Services, error) {
-	db, err := gorm.Open("postgres", connectionInfo)
+	// Cambiar a "mysql" en lugar de "postgres"
+	db, err := gorm.Open("mysql", connectionInfo)
 	if err != nil {
 		return nil, err
 	}
 
+	// Desactivar el modo de log (puedes dejarlo activado si prefieres)
 	db.LogMode(false)
 
 	return &Services{
@@ -17,7 +20,6 @@ func NewServices(connectionInfo string) (*Services, error) {
 		db:   db,
 	}, nil
 }
-
 type Services struct {
 	User UserService
 	Crm  CrmService
@@ -30,7 +32,7 @@ func (s *Services) Close() error {
 
 func (s *Services) DestructiveReset() error {
 	// Eliminar las tablas existentes si existen
-	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.DropTableIfExists(&Material{}, &User{}, &pwReset{}, &Printer{}, &PrinterMaintenance{},  &Category{}, &Product{}, &Order{}).Error; err != nil {
 		return err
 	}
 
@@ -40,7 +42,7 @@ func (s *Services) DestructiveReset() error {
 
 func (s *Services) AutoMigrate() error {
 	// Realizar migraciones automáticas para todos los modelos
-	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{},  &Category{}, &Product{}, &OrderProductMaterial{}, &Order{}).Error; err != nil {
+	if err := s.db.AutoMigrate(&User{}, &pwReset{}, &PrinterMaintenance{}, &Printer{}, &Material{},  &Category{}, &Product{}, &Order{}).Error; err != nil {
 		return err
 	}
 	return nil

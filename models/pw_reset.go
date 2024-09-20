@@ -8,7 +8,7 @@ import (
 
 type pwReset struct {
     ProtoModel
-	UserID    uint   `gorm:"not null"`
+	UserID    string   `gorm:"not null"`
 	Token     string `gorm:"-"`
 	TokenHash string `gorm:"not null;unique_index"`
 }
@@ -72,7 +72,7 @@ func (pwrg *pwResetGorm) Delete(id uint) error {
 }
 
 func (pwrv *pwResetValidator) requireUserID(pwr *pwReset) error {
-	if pwr.UserID <= 0 {
+	if pwr.UserID == "" {
 		return ErrUserIDRequired
 	}
 	return nil

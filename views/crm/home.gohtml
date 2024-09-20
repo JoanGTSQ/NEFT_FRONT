@@ -18,8 +18,8 @@
                         <div class="">
                             <p class="mb-2 text-secondary">Beneficio total</p>
                             <div class="d-flex flex-wrap justify-content-start align-items-center">
-                               <h5 class="mb-0 font-weight-bold">{{minus .Yield.TotalSales .Yield.TotalOrderExpenses}}</h5>
-                               <p class="mb-0 ml-3 text-success font-weight-bold">+{{percentage .Yield.TotalSales .Yield.TotalOrderExpenses}}%</p>
+                               <h5 class="mb-0 font-weight-bold">{{minus 10 20}}</h5>
+                               <p class="mb-0 ml-3 text-success font-weight-bold">+{{percentage 10 20}}%</p>
                             </div>                            
                         </div>
                      </div>
@@ -33,7 +33,7 @@
                         <div class="">
                             <p class="mb-2 text-secondary">Gastos totales</p>
                             <div class="d-flex flex-wrap justify-content-start align-items-center">
-                               <h5 class="mb-0 font-weight-bold">{{.Yield.TotalOrderExpenses}}</h5></h5>
+                               <h5 class="mb-0 font-weight-bold">20</h5></h5>
                                <p class="mb-0 ml-3 text-success font-weight-bold">+2.67% (TODO)</p>
                             </div>                            
                         </div>
@@ -48,7 +48,7 @@
                         <div class="">
                            <p class="mb-2 text-secondary">Facturación total</p>
                            <div class="d-flex flex-wrap justify-content-start align-items-center">
-                              <h5 class="mb-0 font-weight-bold">{{.Yield.TotalSales}}</h5>
+                              <h5 class="mb-0 font-weight-bold">{{10}}</h5>
                               <p class="mb-0 ml-3 text-danger font-weight-bold">-9.98% (TODO)</p>
                            </div>                            
                         </div>
@@ -89,19 +89,19 @@
             </div>
             <div class="card-body-list">               
                <ul class="list-style-3 mb-0">
-               {{range .Yield.Products}}
+               
                   <li class="p-3 list-item d-flex justify-content-start align-items-center">
                      <div class="avatar">
-                        <img class="avatar avatar-img avatar-60 rounded" src="/assets/images/products/{{ .Picture}}" alt="1.jpg">                        
+                        <img class="avatar avatar-img avatar-60 rounded" src="/assets/images/products/asdas" alt="1.jpg">                        
                      </div>
                      <div class="list-style-detail ml-3 mr-2">
-                        <p class="mb-0">{{ .Name }}</p>
+                        <p class="mb-0">Prueba</p>
                      </div>
                      <div class="list-style-action d-flex justify-content-end ml-auto">                        
-                        <h6 class="font-weight-bold">${{.Price}}</h6>                        
+                        <h6 class="font-weight-bold">$2</h6>                        
                      </div>
                   </li>
-                  {{end}}
+                  
                </ul>
             </div>
          </div>
@@ -130,24 +130,24 @@
                     </tr>
                  </thead>
                  <tbody>
-                 {{range .Yield.Orders}}
+                  {{range .Yield.Orders}}
                     <tr class="white-space-no-wrap">
-                        <td>{{ formatDate .CreatedAt}}</td>
+                        <td>2023</td>
                        <td>prueba</td>
                        <td>
-                          {{.Customer.Name}}
+                          cliente
                        </td>
-                       <td> prueba2
-                        
+                       <td> 
+                           {{range .OrderLines}} {{ toMoney .Price}} {{.Attribute}}{{end}}
                        </td>
                        <td>
-                          <p class="mb-0 text-success d-flex justify-content-start align-items-center">${{.Cost}}
+                          <p class="mb-0 text-success d-flex justify-content-start align-items-center">$5
                           </p>
                        </td>
-                       <td>${{.Sale}}</td>
-                       <td class="text-right">${{minus .Sale .Cost }}</td>
+                       <td>$22</td>
+                       <td class="text-right">{{ toMoney .TotalAmount}}</td>
                     </tr>
-                    {{end}}
+                  {{end}}  
 
                  </tbody>
               </table>
@@ -226,22 +226,20 @@
       var datosChart1 = {
     series: [{
       name: 'Ingresos',
-      data: [ {{range .Yield.Orders}}
-                {{.Sale}},
-                {{end}}]
+      data: [ {{/*range .Yield.Orders */}}
+                {{/*.Sale*/}},
+                {{/*end*/}}]
     }, {
       name: 'Gastos',
-      data: [{{range .Yield.Orders}}
-                {{.Cost}},
-                {{end}}]
+      data: [{{/*range .Yield.Orders*/}}
+                {{/*.Cost*/}},
+                {{/*end*/}}]
     }],
-    categories: [ {{range .Yield.Orders}} 
-    '{{ formatDate .CreatedAt}}',
-    {{end}}
+    categories: [ {{/*range .Yield.Orders*/}} 
+    '{{/* formatDate .CreatedAt*/}}',
+    {{/*end*/}}
     ]
   };
     </script>
-
-
 {{end}}
 {{template "yield"}}

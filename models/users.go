@@ -5,12 +5,11 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
+	"jgt.solutions/logController"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 	"jgt.solutions/hash"
-	"jgt.solutions/rand"
 )
 
 var (
@@ -40,19 +39,19 @@ const (
 )
 
 type UserDB interface {
-	ByID(id uint) (*User, error)
+	ByID(id string) (*User, error)
 	ByEmail(email string) (*User, error)
 	ByRemember(token string) (*User, error)
 
 	Create(user *User) error
 	Update(user *User) error
-	Delete(id uint) error
+	Delete(id string) error
 }
 
 type UserService interface {
 	Authenticate(email, password string) (*User, error)
 
-	InitiateReset(userID uint) (string, error)
+	InitiateReset(userID string) (string, error)
 	CompleteReset(token, newPw string) (*User, error)
 	UserDB
 }
@@ -63,9 +62,9 @@ func NewUserService(gD *gorm.DB) UserService {
 		return nil
 	}
 	hmac := hash.NewHMAC(hmacScretKey)
-	uv := newUserValidator(ug, hmac)
+	//uv := newUserValidator(ug, hmac)
 	return &userService{
-		UserDB:    uv,
+		UserDB:    ug,
 		pwResetDB: newPwResetValidator(&pwResetGorm{db: gD}, hmac),
 	}
 }
@@ -83,208 +82,12 @@ type userValidator struct {
 
 type userValFunc func(*User) error
 
-func runUserValFuncs(user *User, fns ...userValFunc) error {
-	for _, fn := range fns {
-		if err := fn(user); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func newUserValidator(udb UserDB, hmac hash.HMAC) *userValidator {
 	return &userValidator{
 		UserDB:     udb,
 		hmac:       hmac,
 		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\]+@[a-z0-9.\-]+\.[a-z]{2,16}$`),
 	}
-}
-
-func (uv *userValidator) ByEmail(email string) (*User, error) {
-	user := User{
-		Email: email,
-	}
-	if err := runUserValFuncs(&user, normalizeEmail, defaultify, hmacRemember); err != nil {
-		return nil, err
-	}
-
-	return uv.UserDB.ByEmail(user.Email)
-}
-
-func bcryptPassword(user *User) error {
-	if user.Password == "" {
-		return nil
-	}
-
-	pwByte := []byte(user.Password + userPwPPepper)
-
-	hashedBytes, err := bcrypt.GenerateFromPassword(pwByte, bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	user.PasswordHash = string(hashedBytes)
-	user.Password = ""
-	return nil
-}
-
-func passwordMinLength(user *User) error {
-	if user.Password == "" {
-		return nil
-	}
-	if len(user.Password) < 8 {
-		return ErrPasswordTooShort
-	}
-	return nil
-}
-
-func passwordHashRequired(user *User) error {
-	if user.PasswordHash == "" {
-		return ErrPasswordRequired
-	}
-	return nil
-}
-
-func passwordRequired(user *User) error {
-	if user.Password == "" {
-		return ErrPasswordRequired
-	}
-	return nil
-}
-
-func hmacRemember(user *User) error {
-	if user.Remember == "" {
-		return nil
-	}
-	hmac := hash.NewHMAC(hmacScretKey)
-	user.RememberHash = hmac.Hash(user.Remember)
-	return nil
-}
-
-func defaultify(user *User) error {
-	if user.Remember != "" {
-		return nil
-	}
-
-	token, err := rand.RememberToken()
-	if err != nil {
-		return err
-	}
-	user.Remember = token
-	return nil
-}
-
-func rememberMinBytes(user *User) error {
-	if user.Remember == "" {
-		return nil
-	}
-	n, err := rand.NBytes(user.Remember)
-	if err != nil {
-		return err
-
-	}
-	if n < 32 {
-		return ErrRememberTooShort
-	}
-	return nil
-}
-func rememberHashRequired(user *User) error {
-	if user.RememberHash == "" {
-		return ErrPasswordRequired
-	}
-	return nil
-}
-func idGreaterThanZero(user *User) error {
-	if user.ID <= 0 {
-		return ErrIDInvalid
-	}
-	return nil
-}
-
-func normalizeEmail(user *User) error {
-	user.Email = strings.ToLower(user.Email)
-	user.Email = strings.TrimSpace(user.Email)
-
-	return nil
-}
-
-func requireEmail(user *User) error {
-	if user.Email == "" {
-		return ErrEmailIsRequired
-	}
-	return nil
-}
-
-func emailFormat(user *User) error {
-	if user.Email == "" {
-		return nil
-	}
-	emailRegex := regexp.MustCompile(`^[a-z0-9._%+\]+@[a-z0-9.\-]+\.[a-z]{2,16}$`)
-	if !emailRegex.MatchString(user.Email) {
-		return ErrEmailIsNotValid
-	}
-	return nil
-}
-
-func (uv *userValidator) Create(user *User) error {
-
-	if err := runUserValFuncs(user,
-		passwordRequired,
-		passwordMinLength,
-		bcryptPassword,
-		passwordHashRequired,
-		defaultify,
-		rememberMinBytes,
-		hmacRemember,
-		rememberHashRequired,
-		normalizeEmail,
-		requireEmail,
-		emailFormat,
-	); err != nil {
-		return err
-	}
-
-	return uv.UserDB.Create(user)
-}
-
-func (uv *userValidator) Update(user *User) error {
-	if err := runUserValFuncs(user,
-		passwordMinLength,
-		bcryptPassword,
-		passwordHashRequired,
-		rememberMinBytes,
-		hmacRemember,
-		rememberHashRequired,
-		normalizeEmail,
-		requireEmail,
-		emailFormat,
-	); err != nil {
-		return err
-	}
-
-	return uv.UserDB.Update(user)
-}
-
-func (uv *userValidator) Delete(id uint) error {
-	var user User
-	user.ID = id
-	err := runUserValFuncs(&user, idGreaterThanZero)
-	if err != nil {
-		return err
-	}
-	return uv.UserDB.Delete(id)
-}
-
-func (uv *userValidator) ByRemember(token string) (*User, error) {
-	user := User{
-		Remember: token,
-	}
-	if err := runUserValFuncs(&user,
-		hmacRemember,
-		rememberHashRequired); err != nil {
-		return nil, err
-	}
-
-	return uv.UserDB.ByRemember(user.RememberHash)
 }
 
 func newUserGorm(db *gorm.DB) (*userGorm, error) {
@@ -299,7 +102,7 @@ type userGorm struct {
 	db *gorm.DB
 }
 
-func (ug *userGorm) ByID(id uint) (*User, error) {
+func (ug *userGorm) ByID(id string) (*User, error) {
 	var user User
 	db := ug.db.Where("id = ?", id).First(&user)
 	err := first(db, &user)
@@ -314,16 +117,16 @@ func (ug *userGorm) ByEmail(email string) (*User, error) {
 	return &user, err
 }
 
-func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
+func (ug *userGorm) ByRemember(rememberToken string) (*User, error) {
 	var user User
-	err := first(ug.db.Where("remember_hash = ?", rememberHash), &user)
+	err := first(ug.db.Where("remember_token = ?", rememberToken), &user)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (us *userService) InitiateReset(userID uint) (string, error) {
+func (us *userService) InitiateReset(userID string) (string, error) {
 	pwr := pwReset{
 		UserID: userID,
 	}
@@ -345,7 +148,7 @@ func (us *userService) CompleteReset(token, newPw string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(newPw+userPwPPepper))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(newPw+userPwPPepper))
 	if err == nil {
 		return nil, ErrSamePasswordReset
 	}
@@ -373,9 +176,12 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 
 	foundUser, err := us.ByEmail(email)
 	if err != nil {
+		logController.DebugLogger.Println("user not found")
 		return nil, ErrEmailNotExist
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+userPwPPepper))
+	logController.DebugLogger.Println("user found", foundUser.Password)
+	logController.DebugLogger.Println("Our Password hash", []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(password))
 	if err != nil {
 		switch err {
 		case bcrypt.ErrMismatchedHashAndPassword:
@@ -387,6 +193,7 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 
 	return foundUser, nil
 }
+
 
 func first(db *gorm.DB, dst interface{}) error {
 	err := db.First(dst).Error
@@ -408,8 +215,8 @@ func (ug *userGorm) Create(user *User) error {
 	return nil
 }
 
-func (ug *userGorm) Delete(id uint) error {
-	user := User{ProtoModel: ProtoModel{ID: id}}
+func (ug *userGorm) Delete(id string) error {
+	user := User{ID: id}
 	return ug.db.Delete(&user).Error
 }
 
@@ -418,18 +225,19 @@ func (ug *userGorm) Update(user *User) error {
 }
 
 type User struct {
-	ProtoModel
-	Name         string    `gorm:"not null"`
-	Email        string    `gorm:"not null;unique_index"`
-	Password     string    `gorm:"-"`
-	PasswordHash string    `gorm:"not null"`
-	Remember     string    `gorm:"-"`
-	RememberHash string    `gorm:"not null;unique_index"`
-	PermLevel    string    `gorm:"not null;default:'User'"`
-	Enabled      bool      `gorm:"not null;default:false"`
-	Photo        string    `gorm:"default:null"`
-	DOB          time.Time `gorm:""`
-	Phone        string    `gorm:""`
-	Instagram    string    `gorm:""`
-	Direction    string    `gorm:""`
+	ID             string         `gorm:"type:uuid;primaryKey"`  // El campo de UUID como clave primaria
+	Name           string         `gorm:"type:varchar(255)"`      // Nombre
+	LastName       string         `gorm:"type:varchar(255)"`      // Apellido
+	Email          string         `gorm:"type:varchar(255);unique"` // Correo electrónico, único
+	Password       string         `gorm:"type:varchar(255)"`      // Contraseña (hashed)
+	NIF            string         `gorm:"type:varchar(50)"`       // Número de identificación fiscal (NIF)
+	PhoneNumber    string         `gorm:"type:varchar(20)"`       // Número de teléfono
+	IsAdmin        bool           `gorm:"default:false"`          // Es administrador
+	IsActive       bool           `gorm:"default:true"`           // Está activo
+	IsSupplier     bool           `gorm:"default:false"`          // Es proveedor
+	EmailVerifiedAt *time.Time     // Fecha de verificación del correo electrónico
+	RememberToken  string         `gorm:"type:varchar(100)"`      // Token para recordar el usuario (opcional)
+	CreatedAt      time.Time      // Fecha de creación
+	UpdatedAt      time.Time      // Fecha de actualización
+	DeletedAt      time.Time  `gorm:"index"`                  // Soft deletes con GORM
 }

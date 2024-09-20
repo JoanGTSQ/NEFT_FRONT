@@ -45,8 +45,9 @@ func main() {
 
 	logController.InfoLogger.Println("Starting server")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=require",
-		dbDirection, 5432, dbUser, dbPassword, dbName)
+	psqlInfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dbUser, dbPassword, dbDirection, 3306, dbName)
+	
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 		logController.ErrorLogger.Println(err)
@@ -56,11 +57,11 @@ func main() {
 
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
-	logController.DebugLogger.Println("Configuring Database connection")
-	err = services.AutoMigrate()
-	if err != nil {
-		fmt.Println(err)
-	}
+	//logController.DebugLogger.Println("Configuring Database connection")
+	//err = services.AutoMigrate()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
 
 	logController.DebugLogger.Println("Configuring all controllers")
 
@@ -151,10 +152,6 @@ func main() {
 	r.HandleFunc("/reset", userC.CompleteReset).Methods("POST")
 
 	// Start server
-
-	if debug {
-		go middleware.PrintStats()
-	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9000" // Default port if not specified

@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/jinzhu/gorm"
 	"jgt.solutions/logController"
+	"time"
 )
 
 type CrmDB interface {
@@ -79,18 +80,18 @@ func (tg *crmGorm) CreateOrder(order *Order) error {
 	}
 
 	// Asocia los productos con el pedido
-	for _, product := range order.Products {
-		if err := tg.db.Model(order).Association("Products").Append(product).Error; err != nil {
-			return err
-		}
-	}
+	//for _, product := range order.Products {
+	//	if err := tg.db.Model(order).Association("Products").Append(product).Error; err != nil {
+	//		return err
+	//	}
+	//}
 
 	return nil
 }
 
-func (tg *crmGorm) CreateOrderProductMaterial(orderProductMaterial []OrderProductMaterial) error {
-	return tg.db.Create(orderProductMaterial).Error
-}
+//func (tg *crmGorm) CreateOrderProductMaterial(orderProductMaterial []OrderProductMaterial) error {
+//	return tg.db.Create(orderProductMaterial).Error
+//}
 
 type result struct {
 	Total float64
@@ -117,11 +118,8 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 }
 func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	var orders []*Order
-	err := tg.db.Preload("Customer").
-		Preload("Products").
-		Preload("Products.Product").
-		Preload("Products.Material").
-		Preload("Products.Printer").
+	err := tg.db.Preload("OrderLines").
+		Preload("OrderLines.Attribute").
 		Find(&orders).Error
 	if err != nil {
 		return nil, err
@@ -205,22 +203,6 @@ func (tg *crmGorm) GetAllUsers() ([]*User, error) {
 	return customers, nil
 }
 func (tg *crmGorm) CreateCustomer(user *User) error {
-	if err := runUserValFuncs(user,
-		passwordRequired,
-		passwordMinLength,
-		bcryptPassword,
-		passwordHashRequired,
-		defaultify,
-		rememberMinBytes,
-		hmacRemember,
-		rememberHashRequired,
-		normalizeEmail,
-		requireEmail,
-		emailFormat,
-	); err != nil {
-		return err
-	}
-
 	return tg.db.Create(user).Error
 
 }
@@ -288,25 +270,78 @@ type Material struct {
 	Price    float64 `gorm:"not null"`
 }
 
-type OrderProductMaterial struct {
-	ProtoModel
-	OrderID    int      `gorm:"" json:"orderid"`
-	Order      Order    `gorm:"foreignkey:orderID"`
-	ProductID  int      `gorm:""`
-	Product    Product  `gorm:"foreignkey:productID"`
-	MaterialID int      `gorm:""`
-	Material   Material `gorm:"foreignkey:materialID"`
-	PrinterID  int      `gorm:""`
-	Printer    Printer  `gorm:"foreignkey:printerID"`
-	Quality    string   `gorm:"not null"`
-}
 type Order struct {
-	ProtoModel
-	CustomerID  int                     `gorm:"" json:"customerid"`
-	Customer    User                    `gorm:"foreignkey:customerID"`
-	Products    []*OrderProductMaterial `json:"products"` // Elimina la opción `gorm:"many2many:order_product_materials"`
-	TimeMinutes int                     `gorm:"not null"`
-	Cost        float64                 `gorm:"not null"`
-	Sale        float64                 `gorm:"not null"`
-	Sent        bool                    `gorm:"not null"`
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    UserID      string    `gorm:"type:varchar(255)"`       // ID del usuario (UUID)
+    Comment     string    `gorm:"type:text"`               // Comentario
+    BaseAmount  int64     `gorm:"type:bigint"`             // Monto base
+    TotalAmount int64     `gorm:"type:bigint"`             // Monto total
+    IsCompleted bool      `gorm:"default:false"`           // Indica si está completada
+    CreatedAt   time.Time `gorm:"autoCreateTime"`          // Fecha de creación
+    UpdatedAt   time.Time `gorm:"autoUpdateTime"`          // Fecha de actualización
+    DeletedAt   *time.Time `gorm:"index"`                   // Fecha de eliminación (soft delete)
+	OrderLines []OrderLine `gorm:"foreignKey:OrderID"`
+}
+type OrderLine struct {
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    OrderID      string `gorm:"type:varchar(255)"`       // ID de la orden (UUID)
+    AttributeID  string `gorm:"type:varchar(255)"`       // ID del atributo (UUID)
+    ShipmentID   string `gorm:"type:varchar(255)"`       // ID del envío (UUID)
+    Description  string `gorm:"type:text"`               // Descripción
+    Quantity     int    `gorm:"type:int"`                // Cantidad
+    BasePrice    int64  `gorm:"type:bigint"`             // Precio base
+    Discount      int64  `gorm:"type:bigint"`             // Descuento
+    Vat          float64 `gorm:"type:decimal(10,2)"`      // VAT (Impuesto sobre el valor añadido)
+    Price        int64  `gorm:"type:bigint"`             // Precio final
+	Attribute    Attribute `gorm:"foreignKey:AttributeID"` // Relación con Attribute
+}
+type OrderAddress struct {
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    OrderID        string `gorm:"type:varchar(255)"`       // ID de la orden (UUID)
+    Type           string `gorm:"type:varchar(50)"`        // Tipo de dirección
+    Name           string `gorm:"type:varchar(255)"`       // Nombre
+    AddressLine1   string `gorm:"type:varchar(255)"`       // Línea de dirección 1
+    AddressLine2   string `gorm:"type:varchar(255)"`       // Línea de dirección 2
+    PostalCode     string `gorm:"type:varchar(20)"`        // Código postal
+    City           string `gorm:"type:varchar(100)"`       // Ciudad
+    Region         string `gorm:"type:varchar(100)"`       // Región
+    Country        string `gorm:"type:varchar(100)"`       // País
+    Nif            string `gorm:"type:varchar(50)"`        // NIF
+    PhoneNumber    string `gorm:"type:varchar(20)"`        // Número de teléfono
+    Instructions   string `gorm:"type:text"`               // Instrucciones
+}
+type OrderPaymentStatus struct {
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    OrderID           string `gorm:"type:varchar(255)"`       // ID de la orden (UUID)
+    PaymentStatus     string `gorm:"type:varchar(50)"`        // Estado del pago
+    PaymentType       string `gorm:"type:varchar(50)"`        // Tipo de pago
+    Comment           string `gorm:"type:text"`               // Comentario
+    Amount            int64  `gorm:"type:bigint"`             // Monto total
+    AmountReceived    int64  `gorm:"type:bigint"`             // Monto recibido
+    ChargeID          string `gorm:"type:varchar(255)"`       // ID del cargo
+    Pi                string `gorm:"type:varchar(255)"`       // ID de la transacción
+    Pm                string `gorm:"type:varchar(255)"`       // Método de pago
+    PmCardType        string `gorm:"type:varchar(50)"`        // Tipo de tarjeta
+    ReceiptURL        string `gorm:"type:varchar(255)"`       // URL del recibo
+    ErrorID           string `gorm:"type:varchar(255)"`       // ID del error
+    ErrorCode         string `gorm:"type:varchar(50)"`        // Código del error
+    ErrorMessage      string `gorm:"type:text"`               // Mensaje del error
+}
+type OrderStatus struct {
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    OrderID string `gorm:"type:varchar(255)"`       // ID de la orden (UUID)
+    Status  string `gorm:"type:varchar(50)"`        // Estado de la orden
+}
+type Attribute struct {
+    ID             string         `gorm:"type:uuid;primaryKey"`              // ID de la orden
+    ProductID   string `gorm:"type:varchar(255)"`
+    FinishID    string `gorm:"type:varchar(255)"`
+    MaterialID  string `gorm:"type:varchar(255)"`
+    PictureID   string `gorm:"type:varchar(255)"`
+    Price       int    `gorm:"type:int"`
+    CostPrice   int    `gorm:"type:int"`
+    OfferPrice  int    `gorm:"type:int"`
+    Minutes     int    `gorm:"type:int"`
+    InOffer     bool   `gorm:"default:false"`
+    IsActive    bool   `gorm:"default:true"`
 }

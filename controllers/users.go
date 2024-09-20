@@ -59,7 +59,7 @@ func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &cookie)
 	user := context.User(r.Context())
 	token, _ := rand.RememberToken()
-	user.Remember = token
+	user.RememberToken = token
 	err := u.us.Update(user)
 	if err != nil {
         logController.ErrorLogger.Println("Error al actualizar el usuario:", err)
@@ -142,7 +142,7 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		u.LoginView.Render(w, r, &vd)
 		return
 	}
-
+	
 	user, err := u.us.Authenticate(form.Email, form.Password)
 	switch err {
 	case models.ErrInvalidEmail, models.ErrEmailNotExist,
@@ -275,12 +275,12 @@ func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
-	if user.Remember == "" {
+	if user.RememberToken == "" {
 		token, err := rand.RememberToken()
 		if err != nil {
 			return err
 		}
-		user.Remember = token
+		user.RememberToken = token
 		err = u.us.Update(user)
 		if err != nil {
 			return err
@@ -289,7 +289,7 @@ func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 
 	cookie := http.Cookie{
 		Name:     "remember_token",
-		Value:    user.Remember,
+		Value:    user.RememberToken,
 		HttpOnly: true,
 	}
 	http.SetCookie(w, &cookie)

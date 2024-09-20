@@ -52,10 +52,9 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 
 	customer := models.User{
 		Name:      form.Name,
-		Direction: form.Direction,
-		Instagram: form.Instagram,
+
 		Email:     form.Email,
-		Phone:     form.Phone,
+
 		Password:  "12345678",
 	}
 	err := c.crm.CreateCustomer(&customer)
