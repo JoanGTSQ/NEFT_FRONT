@@ -89,19 +89,19 @@
             </div>
             <div class="card-body-list">               
                <ul class="list-style-3 mb-0">
-               
+                   {{range .Yield.Products}}
                   <li class="p-3 list-item d-flex justify-content-start align-items-center">
                      <div class="avatar">
-                        <img class="avatar avatar-img avatar-60 rounded" src="/assets/images/products/asdas" alt="1.jpg">                        
+                        <img class="avatar avatar-img avatar-60 rounded" src="https://protogt.com/storage/{{getMainPicture .}}" alt="1.jpg">
                      </div>
                      <div class="list-style-detail ml-3 mr-2">
-                        <p class="mb-0">Prueba</p>
+                        <p class="mb-0">{{.Name}}</p>
                      </div>
                      <div class="list-style-action d-flex justify-content-end ml-auto">                        
-                        <h6 class="font-weight-bold">$2</h6>                        
+                        <h6 class="font-weight-bold">{{.TotalSold}}</h6>
                      </div>
                   </li>
-                  
+                  {{end}}
                </ul>
             </div>
          </div>
@@ -121,7 +121,6 @@
                  <thead class="table-color-heading">
                     <tr class="text-secondary">
                        <th scope="col">Fecha</th>
-                       <th scope="col">Material</th>          
                        <th scope="col">Cliente</th>
                        <th scope="col">Products</th>
                        <th scope="col">Coste</th>
@@ -131,21 +130,22 @@
                  </thead>
                  <tbody>
                   {{range .Yield.Orders}}
+                      {{ $totalCostPrice  := 0 }}
                     <tr class="white-space-no-wrap">
-                        <td>2023</td>
-                       <td>prueba</td>
+                        <td>{{formatDate .CreatedAt}}</td>
+
                        <td>
-                          cliente
+                          {{.User.Name}} {{.User.LastName}}
                        </td>
                        <td> 
-                           {{range .OrderLines}} {{ toMoney .Price}} {{.Attribute}}{{end}}
+                           {{range .OrderLines}} {{.Attribute.Product.Name}} {{.Attribute.CostPrice}} {{$totalCostPrice = plus $totalCostPrice .Attribute.CostPrice}} {{end}}
                        </td>
                        <td>
-                          <p class="mb-0 text-success d-flex justify-content-start align-items-center">$5
+                          <p class="mb-0 text-success d-flex justify-content-start align-items-center">{{$totalCostPrice}}
                           </p>
                        </td>
-                       <td>$22</td>
-                       <td class="text-right">{{ toMoney .TotalAmount}}</td>
+                       <td>{{ toMoney .TotalAmount}}</td>
+                       <td class="text-right">TODO</td>
                     </tr>
                   {{end}}  
 
@@ -198,6 +198,7 @@
 
     <!-- Page end  -->
 </div>
+</div>
       </div>
     </div>
     <!-- Wrapper End-->
@@ -226,18 +227,18 @@
       var datosChart1 = {
     series: [{
       name: 'Ingresos',
-      data: [ {{/*range .Yield.Orders */}}
-                {{/*.Sale*/}},
-                {{/*end*/}}]
+      data: [ {{range .Yield.Orders }}
+                {{range .OrderLines}} {{.Price}} {{end}},
+                {{end}}]
     }, {
       name: 'Gastos',
-      data: [{{/*range .Yield.Orders*/}}
-                {{/*.Cost*/}},
-                {{/*end*/}}]
+      data: [{{range .Yield.Orders }}
+          {{range .OrderLines}} {{.Attribute.CostPrice}} {{end}},
+          {{end}}]
     }],
-    categories: [ {{/*range .Yield.Orders*/}} 
-    '{{/* formatDate .CreatedAt*/}}',
-    {{/*end*/}}
+    categories: [ {{range .Yield.Orders}}
+    '{{ formatDate .CreatedAt}}',
+    {{end}}
     ]
   };
     </script>

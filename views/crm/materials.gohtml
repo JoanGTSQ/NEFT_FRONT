@@ -63,7 +63,7 @@
                                                     <label class="text-muted m-0" >Nombre</label>
                                                 </th>
                                                 <th scope="col" class="dates">
-                                                    <label class="text-muted mb-0" >Precio</label>
+                                                    <label class="text-muted mb-0" >Precio/KG</label>
                                                 </th>
                                                 <th scope="col">
                                                     <label class="text-muted mb-0" >Color</label>
@@ -93,19 +93,16 @@
                                                     {{.Name}}
                                                 </td>
                                                 <td>
-                                                    {{.Price}}
+                                                    {{toMoney .CostKg}}
                                                 </td>
                                                 <td>
-                                                    <div class="cuadrado" style=" width: 50px;           /* Ancho de 150 píxeles */
-  height: 50px;          /* Alto de 150 píxeles */
-  background: {{.Color}};        /* Fondo de color rojo */
-  border: 1px solid #000; /* Borde color negro y de 1 píxel de grosor */"></div>
+                                                    {{.IsActive}}
                                                 </td>
                                                 <td>
-                                                    {{.Weight}}
+                                                    ¿¿
                                                 </td>
                                                 <td>
-                                                    {{.Supplier}}
+                                                    ??
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        

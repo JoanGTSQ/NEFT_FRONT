@@ -46,8 +46,8 @@ func main() {
 	logController.InfoLogger.Println("Starting server")
 
 	psqlInfo := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-	dbUser, dbPassword, dbDirection, 3306, dbName)
-	
+		dbUser, dbPassword, dbDirection, 3306, dbName)
+
 	services, err := models.NewServices(psqlInfo)
 	if err != nil {
 		logController.ErrorLogger.Println(err)
@@ -127,11 +127,9 @@ func main() {
 	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.FormNewMaterial)).Methods("GET")
 	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.CreateMaterial)).Methods("POST")
 	r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.Customers)).Methods("GET")
-	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.FormNewCustomer)).Methods("GET")
-	r.HandleFunc("/new-customer", requireUseMW.CheckPerm(crmC.CreateCustomer)).Methods("POST")
 	r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
-	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.CreateOrder)).Methods("POST")
+
 	r.HandleFunc("/orders/{id}", requireUseMW.CheckPerm(crmC.ViewSingleOrder)).Methods("GET")
 	r.HandleFunc("/printers", requireUseMW.CheckPerm(crmC.Printers)).Methods("GET")
 	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.FormNewPrinter)).Methods("GET")

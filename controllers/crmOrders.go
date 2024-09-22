@@ -3,7 +3,6 @@ package controllers
 import (
 	"jgt.solutions/logController"
 
-	
 	"net/http"
 	"strconv"
 
@@ -29,7 +28,7 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllUsers()
+	es.Users, err = c.crm.GetAllUsers()
 	if err != nil {
 		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
 		http.Redirect(w, r, "/505", http.StatusFound)
@@ -55,14 +54,6 @@ func (c *Crm) FormNewOrder(w http.ResponseWriter, r *http.Request) {
 	}
 	vd.Yield = es
 	c.NewOrder.Render(w, r, &vd)
-}
-
-// CreateOrder procesa el formulario de creación de orden
-// POST /new-order
-func (c *Crm) CreateOrder(w http.ResponseWriter, r *http.Request) {
-
-
-	http.Redirect(w, r, "/orders", http.StatusFound)
 }
 
 func (c *Crm) ViewSingleOrder(w http.ResponseWriter, r *http.Request) {

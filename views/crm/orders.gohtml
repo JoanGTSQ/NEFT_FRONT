@@ -88,28 +88,24 @@
                                                     </div>                                    
                                                 </td>
                                                 <td>
-                                                    <a href="#">{{.Customer.Name}}</a>
+                                                    <a href="#">{{.User.Name}}</a>
                                                 </td>
                                                 <td>
-                                                    {{ range .Products}}
-                                                    1x {{.Product.Name}} 
+                                                    {{ range .OrderLines}}
+                                                    1x {{.Attribute.Product.Name}}
                                                     {{end}}
                                                 </td>
                                                 <td>
-                                                    {{.TimeMinutes}}
+
                                                 </td>
                                                 <td>
-                                                    {{.Cost}}
+
                                                 </td>
                                                 <td>
-                                                    {{.Sale}}
+                                                    {{ toMoney .TotalAmount}}
                                                 </td>
                                                 <td>
-                                                    {{if .Sent}}
-                                                    Sí
-                                                    {{else}}
-                                                    No
-                                                    {{end}}
+                                                    {{if .IsCompleted}}Sí{{else}}No{{end}}
                                                 </td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        

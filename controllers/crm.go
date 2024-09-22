@@ -50,7 +50,7 @@ type EssentialData struct {
 	Orders             []*models.Order
 	Products           []*models.Product
 	Materials          []*models.Material
-	Customers          []*models.User
+	Users              []*models.User
 	FormFiles          []*FormFile
 	Printers           []*models.Printer
 }
@@ -73,11 +73,11 @@ func (c *Crm) Home(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logController.ErrorLogger.Println("no se han podido obtener todos los pedidos ", err)
 	}
-	logController.DebugLogger.Println(es.Orders)
-	//es.Products, err = c.crm.GetAllProducts()
-	//if err != nil {
-	//	logController.ErrorLogger.Println("no se han podido obtener todos los productos ", err)
-	//}
+
+	es.Products, err = c.crm.GetTopProducts()
+	if err != nil {
+		logController.ErrorLogger.Println("no se han podido obtener todos los productos ", err)
+	}
 
 	vd.Yield = es
 	c.HomeDashboard.Render(w, r, &vd)

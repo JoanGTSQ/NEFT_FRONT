@@ -92,7 +92,7 @@
                                                 <td class="">
                                                     <div class="active-project-1 d-flex align-items-center mt-0 ">
                                                         <div class="h-avatar is-medium">
-                                                            <img class="avatar rounded-circle" src="/assets/images/products/{{.Picture}}">
+                                                            <img class="avatar rounded-circle" src="https://protogt.com/storage/{{getMainPicture .}}">
                                                         </div>
                                                         <div class="data-content">
                                                             <div>
@@ -101,16 +101,9 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td>{{.Price}}</td>
-                                                <td>
-                                                    {{.Description}}
-                                                </td>
-                                                <td>{{.Weight}}</td>
-                                                 <td>
-                                                 {{ range .Category}}
-                                                  {{.Name}} 
-                                                  {{end}}
-                                                  </td>
+                                                <td>{{.UsedMaterial}}</td>
+                                                <td>{{.IsActive}}</td>
+                                                <td>{{.IsCustomizable}}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-end align-items-center">                                                        
                                                         <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/products">

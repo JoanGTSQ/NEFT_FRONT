@@ -11,7 +11,7 @@ func (c *Crm) Customers(w http.ResponseWriter, r *http.Request) {
 	var vd views.Data
 	var es EssentialData
 	var err error
-	es.Customers, err = c.crm.GetAllUsers()
+	es.Users, err = c.crm.GetAllUsers()
 	if err != nil {
 		logController.ErrorLogger.Println("No se han podido obtener todos los clientes ", err)
 		return
@@ -51,11 +51,11 @@ func (c *Crm) CreateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	customer := models.User{
-		Name:      form.Name,
+		Name: form.Name,
 
-		Email:     form.Email,
+		Email: form.Email,
 
-		Password:  "12345678",
+		Password: "12345678",
 	}
 	err := c.crm.CreateCustomer(&customer)
 	if err != nil {

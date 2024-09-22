@@ -15,8 +15,8 @@ func (c *Crm) Products(w http.ResponseWriter, r *http.Request) {
 	es.Products, err = c.crm.GetAllProducts()
 	if err != nil {
 		logController.ErrorLogger.Println("No se han podido obtener todos los pedidos ", err)
-        http.Redirect(w, r, "/505", http.StatusFound)
-        return
+		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
 	vd.Yield = es
 	c.ProductsView.Render(w, r, &vd)
@@ -55,11 +55,11 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		c.NewProduct.Render(w, r, &vd)
 		logController.ErrorLogger.Println(err)
-        http.Redirect(w, r, "/505", http.StatusFound)
-        return
+		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
 
-	namePicture, err := uploadPicture(r, "productPicture", "productPicture", form.Name)
+	_, err := uploadPicture(r, "productPicture", "productPicture", form.Name)
 	if err != nil {
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
@@ -67,10 +67,10 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		c.NewProduct.Render(w, r, &vd)
 		logController.ErrorLogger.Println(err)
-        http.Redirect(w, r, "/505", http.StatusFound)
-        return
+		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
-	nameStl, err := uploadPicture(r, "productSTL", "productSTL", form.Name)
+	_, err = uploadPicture(r, "productSTL", "productSTL", form.Name)
 	if err != nil {
 		vd.Alert = &views.Alert{
 			Level:   views.AlertLvlError,
@@ -78,17 +78,12 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		c.NewProduct.Render(w, r, &vd)
 		logController.ErrorLogger.Println(err)
-        http.Redirect(w, r, "/505", http.StatusFound)
-        return
+		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
 	// return that we have successfully uploaded our file!
 	product := models.Product{
-		Name:        form.Name,
-		Picture:     namePicture,
-		Stl:         nameStl,
-		Price:       form.Price,
-		Description: form.Description,
-		Weight:      form.Weight,
+		Name: form.Name,
 	}
 	err = c.crm.CreateProduct(&product)
 	if err != nil {
@@ -98,8 +93,8 @@ func (c *Crm) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		c.NewProduct.Render(w, r, &vd)
 		logController.ErrorLogger.Println(err)
-        http.Redirect(w, r, "/505", http.StatusFound)
-        return
+		http.Redirect(w, r, "/505", http.StatusFound)
+		return
 	}
 
 	http.Redirect(w, r, "/products", http.StatusFound)
