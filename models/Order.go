@@ -13,6 +13,18 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 	return orders, nil
 }
 
+func (order *Order) ByID() error {
+
+	return DB.Where("id = ?", order.ID).
+		Preload("Customer").
+		Preload("Products").
+		Preload("Products.Product").
+		Preload("Products.Material").
+		Preload("Products.Printer").
+		Find(&order).Error
+
+}
+
 type Order struct {
 	ID          string      `gorm:"type:uuid;primaryKey"` // ID de la orden
 	UserID      string      `gorm:"type:varchar(255)"`    // ID del usuario (UUID)

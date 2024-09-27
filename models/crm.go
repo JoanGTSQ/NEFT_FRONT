@@ -22,7 +22,6 @@ type CrmDB interface {
 	CountAllSales() (float64, error)
 	CountAllSalesExpenses() (float64, error)
 	GetAllOrders() ([]*Order, error)
-	SearchOrderByID(id int) (*Order, error)
 
 	GetAllCategories() ([]*Category, error)
 
@@ -127,18 +126,6 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 	}
 
 	return result.Total, nil
-}
-
-func (tg *crmGorm) SearchOrderByID(id int) (*Order, error) {
-	var order Order
-	err := tg.db.Where("id = ?", id).
-		Preload("Customer").
-		Preload("Products").
-		Preload("Products.Product").
-		Preload("Products.Material").
-		Preload("Products.Printer").
-		Find(&order).Error
-	return &order, err
 }
 
 // Functions categories

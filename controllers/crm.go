@@ -17,15 +17,16 @@ func NewCrm(crm models.CrmService) *Crm {
 		NewMaterial:   views.NewView("dashboard", "crm/addMaterial"),
 		CustomersView: views.NewView("dashboard", "crm/customers"),
 		NewCustomer:   views.NewView("dashboard", "crm/addCustomer"),
-		OrdersView:    views.NewView("dashboard", "crm/orders"),
-		NewOrder:      views.NewView("dashboard", "crm/addOrder"),
-		SingleOrder:   views.NewView("dashboard", "crm/singleOrder"),
-		PrintersView:  views.NewView("dashboard", "crm/printers"),
-		NewPrinter:    views.NewView("dashboard", "crm/addPrinter"),
+
+		PrintersView: views.NewView("dashboard", "crm/printers"),
+		NewPrinter:   views.NewView("dashboard", "crm/addPrinter"),
 
 		UserIndex: views.NewView("dashboard", "crm/user/index"),
 		UserShow:  views.NewView("dashboard", "crm/user/show"),
-		crm:       crm,
+
+		OrderIndex: views.NewView("dashboard", "crm/orders/index"),
+		OrderShow:  views.NewView("dashboard", "crm/orders/show"),
+		crm:        crm,
 	}
 }
 
@@ -42,10 +43,11 @@ type Crm struct {
 	NewPrinter    *views.View
 	CustomersView *views.View
 	NewCustomer   *views.View
-	OrdersView    *views.View
-	NewOrder      *views.View
-	SingleOrder   *views.View
-	crm           models.CrmService
+
+	OrderIndex *views.View
+	OrderShow  *views.View
+
+	crm models.CrmService
 }
 type FormFile struct {
 	Id string
