@@ -25,6 +25,7 @@ type Order struct {
 	DeletedAt   *time.Time  `gorm:"index"`                // Fecha de eliminación (soft delete)
 	OrderLines  []OrderLine `gorm:"foreignKey:OrderID"`
 	User        User        `gorm:"foreignKey:UserID"`
+	OrderStatus OrderStatus `gorm:"foreignKey:OrderID"`
 }
 type OrderLine struct {
 	ID          string    `gorm:"type:uuid;primaryKey"`   // ID de la orden

@@ -1,0 +1,138 @@
+{{ define "yield" }}
+ <div class="wrapper">
+{{template "navbar" .}}
+<div class="content-page">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+               <div class="d-flex align-items-center justify-content-between">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb p-0 mb-0">
+                            <li class="breadcrumb-item"><a href="/customers">Cliente</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Cliente individual</li>
+                        </ol>
+                    </nav>
+                </div>
+                <a href="/products" class="btn btn-primary btn-sm d-flex align-items-center justify-content-between ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="ml-2">Atrás</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-12 mb-3 d-flex justify-content-between">
+            <h4 class="font-weight-bold d-flex align-items-center">Cliente: {{.Yield.ID}}</h4>
+        </div>
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="font-weight-bold mb-3">Información basica</h5>
+                        <div class="col-md-6 mb-3">
+                            <label for="Text1" class="form-label font-weight-bold text-muted text-uppercase">Nombre</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="Enter Name" disabled value="{{.Yield.Name}} {{.Yield.LastName}}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="Text5" class="form-label font-weight-bold text-muted text-uppercase">Email</label>
+                            <input type="text" class="form-control" name="email" id="email" placeholder="Enter Email" disabled value="{{.Yield.Email}}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="Text6" class="form-label font-weight-bold text-muted text-uppercase">Dirección</label>
+                            <input type="text" class="form-control" name="direction" id="direction" {{range .Yield.Addresses}} 
+                            {{if .IsDefault}} 
+                            value="{{.AddressLine1}} {{.PostalCode}} {{.City}}" disabled
+                            {{end}} 
+                            {{end}}
+                            placeholder="Enter Direction"> 
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="color" class="form-label font-weight-bold text-muted text-uppercase">Phone</label>
+                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter Phone" disabled value="{{.Yield.PhoneNumber}}">
+                        </div>
+                        
+                </div>
+                
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    
+                    <h5 class="font-weight-bold mb-3">Pedidos</h5>
+                   <table class="table data-table mb-0">
+                                        <thead class="table-color-heading">
+                                        
+                                            <tr class="text-light">                                                
+                                                <th scope="col" class="pr-0 w-01">
+                                                    <div class="d-flex justify-content-start align-items-end mb-1">
+                                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                                        <input type="checkbox" class="custom-control-input m-0" id="customCheck">
+                                                        <label class="custom-control-label" for="customCheck"></label>
+                                                        </div>
+                                                    </div>                                                    
+                                                </th>
+                                                <th scope="col">
+                                                    <label class="text-muted m-0" >Fecha pedido</label>
+                                                </th>
+                                                <th scope="col" class="dates">
+                                                    <label class="text-muted mb-0" >Comentario</label>
+                                                </th>
+                                                <th scope="col">
+                                                    <label class="text-muted mb-0" >Monto total</label>
+                                                </th>
+                                                <th scope="col">
+                                                    <label class="text-muted mb-0" >Completado</label>
+                                                </th>
+                                                <th scope="col" class="text-right">
+                                                    <label class="text-muted mb-0"></label>
+                                                </th>
+                                            </tr>
+                                            
+                                        </thead>
+                                        <tbody>
+                                        {{range .Yield.Orders}}
+                                            <tr class="white-space-no-wrap">
+                                                <td class="pr-0">
+                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input m-0" id="customCheck1">
+                                                    <label class="custom-control-label" for="customCheck1"></label>
+                                                    </div>                                    
+                                                </td>
+                                                <td>
+                                                    {{formatDate .CreatedAt}}
+                                                </td>
+                                                <td>
+                                                    {{if eq .Comment  nil}} {{.Comment}} {{else}} Sin comentarios {{end}}
+                                                </td>
+                                                <td>
+                                                    {{ toMoney .TotalAmount}}
+                                                </td>
+                                                <td>
+                                                    {{if .IsCompleted}}Sí{{else}}No{{end}}
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex justify-content-end align-items-center">                                                        
+                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="View" href="/order/{{.ID}}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary mx-4" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        </a>
+                                                        <a class="" data-toggle="tooltip" data-placement="top" title="" data-original-title="Print" href="#">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="text-secondary" width="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                                            </svg>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {{end}}
+                                            
+                                        </tbody>
+                                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{end}}
+{{template "yield"}}

@@ -10,6 +10,8 @@ import (
 	"runtime"
 
 	"github.com/gorilla/schema"
+	"jgt.solutions/models"
+	"jgt.solutions/rand"
 )
 
 func ParseForm(r *http.Request, dst interface{}) error {
@@ -88,16 +90,39 @@ func uploadPicture(r *http.Request, idPicture, typeFile, name string) (string, e
 	newFile.Write(fileBytes)
 	return nameFile, nil
 }
+
 // ProductForm representa un producto seleccionado en el formulario
 type ProductForm struct {
-    ProductID int64 `schema:"productID"`
-    MaterialID int64 `schema:"materialID"`
+	ProductID  int64 `schema:"productID"`
+	MaterialID int64 `schema:"materialID"`
 }
 
 // NewOrderForm representa el formulario de creación de una nueva orden
 type NewOrderForm struct {
-    Customer int64 `schema:"customerID"`
-    Products []*ProductForm `schema:"products"`
-    Cost float64 `schema:"cost"`
-    Sale float64 `schema:"sale"`
+	Customer int64          `schema:"customerID"`
+	Products []*ProductForm `schema:"products"`
+	Cost     float64        `schema:"cost"`
+	Sale     float64        `schema:"sale"`
+}
+
+func signIn(w http.ResponseWriter, user *models.User) error {
+	if user.RememberToken == "" {
+		token, err := rand.RememberToken()
+		if err != nil {
+			return err
+		}
+		user.RememberToken = token
+		err = user.Update()
+		if err != nil {
+			return err
+		}
+	}
+
+	cookie := http.Cookie{
+		Name:     "remember_token",
+		Value:    user.RememberToken,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, &cookie)
+	return nil
 }

@@ -22,11 +22,17 @@ func NewCrm(crm models.CrmService) *Crm {
 		SingleOrder:   views.NewView("dashboard", "crm/singleOrder"),
 		PrintersView:  views.NewView("dashboard", "crm/printers"),
 		NewPrinter:    views.NewView("dashboard", "crm/addPrinter"),
-		crm:           crm,
+
+		UserIndex: views.NewView("dashboard", "crm/user/index"),
+		UserShow:  views.NewView("dashboard", "crm/user/show"),
+		crm:       crm,
 	}
 }
 
 type Crm struct {
+	UserIndex *views.View
+	UserShow  *views.View
+
 	HomeDashboard *views.View
 	ProductsView  *views.View
 	NewProduct    *views.View

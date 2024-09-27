@@ -67,7 +67,8 @@ func main() {
 
 	staticC := controllers.NewStatic()
 	crmC := controllers.NewCrm(services.Crm)
-	userC := controllers.NewUsers(services.User)
+	//userC := controllers.NewUsers(services.User)
+	authC := controllers.NewAuth(services.User)
 
 	r := mux.NewRouter()
 	cssHandler := http.FileServer(http.Dir("./css/"))
@@ -126,7 +127,10 @@ func main() {
 	r.HandleFunc("/materials", requireUseMW.CheckPerm(crmC.Materials)).Methods("GET")
 	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.FormNewMaterial)).Methods("GET")
 	r.HandleFunc("/new-material", requireUseMW.CheckPerm(crmC.CreateMaterial)).Methods("POST")
-	r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.Customers)).Methods("GET")
+
+	r.HandleFunc("/customers", requireUseMW.CheckPerm(crmC.UserIndexFunc)).Methods("GET")
+	r.HandleFunc("/customers/{id}", requireUseMW.CheckPerm(crmC.UserShowFunc)).Methods("GET")
+
 	r.HandleFunc("/orders", requireUseMW.CheckPerm(crmC.Orders)).Methods("GET")
 	r.HandleFunc("/new-order", requireUseMW.CheckPerm(crmC.FormNewOrder)).Methods("GET")
 
@@ -134,20 +138,21 @@ func main() {
 	r.HandleFunc("/printers", requireUseMW.CheckPerm(crmC.Printers)).Methods("GET")
 	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.FormNewPrinter)).Methods("GET")
 	r.HandleFunc("/new-printer", requireUseMW.CheckPerm(crmC.CreatePrinter)).Methods("POST")
+
 	r.NotFoundHandler = staticC.NotFound
 	r.Handle("/505", staticC.Error).Methods("GET")
 
 	// Login And Register
 
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.New)).Methods("GET")
-	r.HandleFunc("/signup", requireUseMW.CheckUser(userC.Create)).Methods("POST")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.LoginNew)).Methods("GET")
-	r.HandleFunc("/login", requireUseMW.CheckUser(userC.Login)).Methods("POST")
-	r.HandleFunc("/logout", userC.Logout).Methods("POST")
-	r.Handle("/forgot", userC.ForgotPwView).Methods("GET")
-	r.HandleFunc("/forgot", userC.InitiateReset).Methods("POST")
-	r.HandleFunc("/reset", userC.ResetPw).Methods("GET")
-	r.HandleFunc("/reset", userC.CompleteReset).Methods("POST")
+	r.HandleFunc("/signup", requireUseMW.CheckUser(authC.New)).Methods("GET")
+	r.HandleFunc("/signup", requireUseMW.CheckUser(authC.Create)).Methods("POST")
+	r.HandleFunc("/login", requireUseMW.CheckUser(authC.LoginNew)).Methods("GET")
+	r.HandleFunc("/login", requireUseMW.CheckUser(authC.Login)).Methods("POST")
+	r.HandleFunc("/logout", authC.Logout).Methods("POST")
+	r.Handle("/forgot", authC.ForgotPwView).Methods("GET")
+	r.HandleFunc("/forgot", authC.InitiateReset).Methods("POST")
+	r.HandleFunc("/reset", authC.ResetPw).Methods("GET")
+	r.HandleFunc("/reset", authC.CompleteReset).Methods("POST")
 
 	// Start server
 	port := os.Getenv("PORT")
