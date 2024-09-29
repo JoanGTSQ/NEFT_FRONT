@@ -53,7 +53,12 @@ func main() {
 		logController.ErrorLogger.Println(err)
 		os.Exit(0)
 	}
-	defer services.Close()
+	defer func(services *models.Services) {
+		err := services.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(services)
 
 	// use DestructiveReset to restore DB
 	// use AutoMigrate to create or mantain tables but not delete it
@@ -160,7 +165,11 @@ func main() {
 	}
 	logController.InfoLogger.Println("Running web server on port http://127.0.0.1:" + port)
 
-	http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
+	err = http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
+	if err != nil {
+		panic(err)
+		return
+	}
 
 }
 func runServerSSL(handler http.Handler) {
