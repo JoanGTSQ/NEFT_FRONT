@@ -38,6 +38,7 @@ func (c *Crm) ViewSingleOrder(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/505", http.StatusFound)
 		return
 	}
+
 	var vd views.Data
 	vd.Yield = order
 	c.OrderShow.Render(w, r, &vd)

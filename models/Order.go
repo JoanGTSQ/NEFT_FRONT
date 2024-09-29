@@ -16,28 +16,31 @@ func (tg *crmGorm) GetAllOrders() ([]*Order, error) {
 func (order *Order) ByID() error {
 
 	return DB.Where("id = ?", order.ID).
-		Preload("Customer").
-		Preload("Products").
-		Preload("Products.Product").
-		Preload("Products.Material").
-		Preload("Products.Printer").
+		Preload("User").
+		Preload("OrderLines.Attribute.Product").
+		Preload("OrderLines.Attribute.Material").
+		Preload("OrderLines.Attribute.Finish").
+		Preload("OrderAddress").
+		Preload("OrderStatus").
 		Find(&order).Error
 
 }
 
 type Order struct {
-	ID          string      `gorm:"type:uuid;primaryKey"` // ID de la orden
-	UserID      string      `gorm:"type:varchar(255)"`    // ID del usuario (UUID)
-	Comment     string      `gorm:"type:text"`            // Comentario
-	BaseAmount  int         `gorm:"type:bigint"`          // Monto base
-	TotalAmount int         `gorm:"type:bigint"`          // Monto total
-	IsCompleted bool        `gorm:"default:false"`        // Indica si está completada
-	CreatedAt   time.Time   `gorm:"autoCreateTime"`       // Fecha de creación
-	UpdatedAt   time.Time   `gorm:"autoUpdateTime"`       // Fecha de actualización
-	DeletedAt   *time.Time  `gorm:"index"`                // Fecha de eliminación (soft delete)
-	OrderLines  []OrderLine `gorm:"foreignKey:OrderID"`
-	User        User        `gorm:"foreignKey:UserID"`
-	OrderStatus OrderStatus `gorm:"foreignKey:OrderID"`
+	ID                 string             `gorm:"type:uuid;primaryKey"` // ID de la orden
+	UserID             string             `gorm:"type:varchar(255)"`    // ID del usuario (UUID)
+	Comment            string             `gorm:"type:text"`            // Comentario
+	BaseAmount         int                `gorm:"type:bigint"`          // Monto base
+	TotalAmount        int                `gorm:"type:bigint"`          // Monto total
+	IsCompleted        bool               `gorm:"default:false"`        // Indica si está completada
+	CreatedAt          time.Time          `gorm:"autoCreateTime"`       // Fecha de creación
+	UpdatedAt          time.Time          `gorm:"autoUpdateTime"`       // Fecha de actualización
+	DeletedAt          *time.Time         `gorm:"index"`                // Fecha de eliminación (soft delete)
+	OrderLines         []OrderLine        `gorm:"foreignKey:OrderID"`
+	User               User               `gorm:"foreignKey:UserID"`
+	OrderStatus        OrderStatus        `gorm:"foreignKey:OrderID"`
+	OrderAddress       OrderAddress       `gorm:"foreignKey:OrderID"`
+	OrderPaymentStatus OrderPaymentStatus `gorm:"foreignKey:OrderID"`
 }
 type OrderLine struct {
 	ID          string    `gorm:"type:uuid;primaryKey"`   // ID de la orden
@@ -53,19 +56,19 @@ type OrderLine struct {
 	Attribute   Attribute `gorm:"foreignKey:AttributeID"` // Relación con Attribute
 }
 type OrderAddress struct {
-	ID           string `gorm:"type:uuid;primaryKey"` // ID de la orden
-	OrderID      string `gorm:"type:varchar(255)"`    // ID de la orden (UUID)
-	Type         string `gorm:"type:varchar(50)"`     // Tipo de dirección
-	Name         string `gorm:"type:varchar(255)"`    // Nombre
-	AddressLine1 string `gorm:"type:varchar(255)"`    // Línea de dirección 1
-	AddressLine2 string `gorm:"type:varchar(255)"`    // Línea de dirección 2
-	PostalCode   string `gorm:"type:varchar(20)"`     // Código postal
-	City         string `gorm:"type:varchar(100)"`    // Ciudad
-	Region       string `gorm:"type:varchar(100)"`    // Región
-	Country      string `gorm:"type:varchar(100)"`    // País
-	Nif          string `gorm:"type:varchar(50)"`     // NIF
-	PhoneNumber  string `gorm:"type:varchar(20)"`     // Número de teléfono
-	Instructions string `gorm:"type:text"`            // Instrucciones
+	ID           string `gorm:"type:uuid;primaryKey"`                    // ID de la orden
+	OrderID      string `gorm:"type:varchar(255)"`                       // ID de la orden (UUID)
+	Type         string `gorm:"type:varchar(50)"`                        // Tipo de dirección
+	Name         string `gorm:"type:varchar(255)"`                       // Nombre
+	AddressLine1 string `gorm:"column:address_line_1;type:varchar(255)"` // Nombre de la columna en la base de datos
+	AddressLine2 string `gorm:"column:address_line_2;type:varchar(255)"` // Línea de dirección 2
+	PostalCode   string `gorm:"type:varchar(20)"`                        // Código postal
+	City         string `gorm:"type:varchar(100)"`                       // Ciudad
+	Region       string `gorm:"type:varchar(100)"`                       // Región
+	Country      string `gorm:"type:varchar(100)"`                       // País
+	Nif          string `gorm:"type:varchar(50)"`                        // NIF
+	PhoneNumber  string `gorm:"type:varchar(20)"`                        // Número de teléfono
+	Instructions string `gorm:"type:text"`                               // Instrucciones
 }
 type OrderPaymentStatus struct {
 	ID             string `gorm:"type:uuid;primaryKey"` // ID de la orden

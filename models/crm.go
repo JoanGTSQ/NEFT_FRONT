@@ -23,7 +23,7 @@ type CrmDB interface {
 	CountAllSalesExpenses() (float64, error)
 	GetAllOrders() ([]*Order, error)
 
-	GetAllCategories() ([]*Category, error)
+	crmCategories
 
 	GetAllUsers() ([]*User, error)
 	CreateCustomer(user *User) error
@@ -128,16 +128,6 @@ func (tg *crmGorm) CountAllSalesExpenses() (float64, error) {
 	return result.Total, nil
 }
 
-// Functions categories
-func (tg *crmGorm) GetAllCategories() ([]*Category, error) {
-	var categories []*Category
-	err := tg.db.Find(&categories).Error
-	if err != nil {
-		return nil, err
-	}
-	return categories, nil
-}
-
 // Functions customer
 
 func (tg *crmGorm) GetAllUsers() ([]*User, error) {
@@ -176,12 +166,6 @@ func (tg *crmGorm) SearchPrinterByID(id int64) (*Printer, error) {
 	var printer Printer
 	err := tg.db.Where("id = ?", id).First(&printer).Error
 	return &printer, err
-}
-
-type Category struct {
-	ProtoModel
-	Name        string `gorm:"not null"`
-	Description string `gorm:"not null"`
 }
 
 type PrinterMaintenance struct {

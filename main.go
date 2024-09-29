@@ -158,7 +158,7 @@ func main() {
 	if port == "" {
 		port = "9000" // Default port if not specified
 	}
-	logController.InfoLogger.Println("Running web server on port " + port)
+	logController.InfoLogger.Println("Running web server on port http://127.0.0.1:" + port)
 
 	http.ListenAndServe(":"+port, csrfMw(userMW.Apply(r)))
 
